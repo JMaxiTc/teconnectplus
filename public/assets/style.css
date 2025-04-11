@@ -1,0 +1,29 @@
+/* Estilo del sidebar */
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #1f1f1f;
+    color: white;
+    padding: 20px;
+    position: fixed;
+}
+
+/* Asegura que el contenido principal no se superponga */
+.main-content {
+    margin-left: 250px; /* Debe coincidir con el ancho del sidebar */
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Enlaces del sidebar */
+.sidebar .nav-link {
+    color: white;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #343a40;
+    border-radius: 8px;
+}
