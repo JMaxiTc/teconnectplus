@@ -1,6 +1,6 @@
 /* Estilo del sidebar */
 .sidebar {
-    width: 250px;
+    width: 30px;
     height: 100vh;
     background-color: #1f1f1f;
     color: white;
@@ -10,7 +10,7 @@
 
 /* Asegura que el contenido principal no se superponga */
 .main-content {
-    margin-left: 250px; /* Debe coincidir con el ancho del sidebar */
+    margin-left: 30px; /* Debe coincidir con el ancho del sidebar */
     background-color: #f8f9fa;
     min-height: 100vh;
     padding: 20px;
