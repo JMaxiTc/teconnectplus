@@ -3,6 +3,106 @@
 @component("components.breadcrumbs",["breadcrumbs"=>$breadcrumbs])
 @endcomponent
 
+@auth
+<div class="alert {{ Auth::user()->esAsesor() ? 'alert-primary' : 'alert-success' }} mb-4 shadow-sm">
+    <div class="d-flex align-items-center">
+        <div class="flex-shrink-0">
+            <i class="fas {{ Auth::user()->esAsesor() ? 'fa-chalkboard-teacher' : 'fa-user-graduate' }} fa-3x me-3"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h4 class="alert-heading">
+                {{ Auth::user()->esAsesor() ? '¡Bienvenido Asesor!' : '¡Bienvenido Estudiante!' }}
+            </h4>
+            <p class="mb-0">
+                <strong>{{ Auth::user()->nombre }} {{ Auth::user()->apellido }}</strong>
+                @if(Auth::user()->esAsesor())
+                    - Estás listo para compartir tu conocimiento y apoyar a otros estudiantes.
+                @else
+                    - Explora todas las asesorías disponibles y encuentra el apoyo académico que necesitas.
+                @endif
+            </p>
+        </div>
+    </div>
+</div>
+
+@if(Auth::user()->esAsesor())
+<div class="role-asesor-only mb-4">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Panel de Asesor</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-calendar-check fa-2x text-primary mb-2"></i>
+                        <h6>Solicitudes Pendientes</h6>
+                        <span class="badge bg-danger">3</span>
+                        <p class="small text-muted">Revisa tus solicitudes pendientes</p>
+                        <a href="/solicitudes" class="btn btn-sm btn-outline-primary">Ver solicitudes</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-book fa-2x text-primary mb-2"></i>
+                        <h6>Mis Materias</h6>
+                        <p class="small text-muted">Gestiona las materias que puedes asesorar</p>
+                        <a href="/mis-materias" class="btn btn-sm btn-outline-primary">Gestionar</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-star fa-2x text-primary mb-2"></i>
+                        <h6>Mis Calificaciones</h6>
+                        <p class="small text-muted">Revisa tus calificaciones como asesor</p>
+                        <a href="/mis-calificaciones" class="btn btn-sm btn-outline-primary">Ver calificaciones</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@if(Auth::user()->esEstudiante())
+<div class="role-estudiante-only mb-4">
+    <div class="card border-success">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Panel de Estudiante</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-search fa-2x text-success mb-2"></i>
+                        <h6>Buscar Asesor</h6>
+                        <p class="small text-muted">Encuentra asesorías para tus materias</p>
+                        <a href="/buscar-asesor" class="btn btn-sm btn-outline-success">Buscar</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-calendar-alt fa-2x text-success mb-2"></i>
+                        <h6>Mis Asesorías</h6>
+                        <p class="small text-muted">Revisa tus asesorías programadas</p>
+                        <a href="/mis-asesorias" class="btn btn-sm btn-outline-success">Ver asesorías</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-graduation-cap fa-2x text-success mb-2"></i>
+                        <h6>Materiales de Estudio</h6>
+                        <p class="small text-muted">Accede a materiales para tus materias</p>
+                        <a href="/materiales" class="btn btn-sm btn-outline-success">Ver materiales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+@endauth
+
 <style>
     .hero-section {
         background: linear-gradient(to right, #104b87, #1e90ff);
@@ -222,7 +322,11 @@
                                         <i class="{{ $subject['icon'] }} mb-3"></i>
                                     @endif
                                     <h5 class="card-title">{{ $subject['name'] }}</h5>
+                                    @auth
                                     <a href="{{ $subject['route'] }}" class="btn btn-primary mt-auto">Ir</a>
+                                    @else
+                                    <a href="{{ route('login', ['redirect' => $subject['route']]) }}" class="btn btn-primary mt-auto">Ir</a>
+                                    @endauth
                                 </div>
                             </div>
                         </div>
@@ -242,6 +346,7 @@
     </div>
 </div>
 
+@guest
 {{-- Info General --}}
 <div class="info-section">
     <h2>¿Qué es esta plataforma?</h2>
@@ -294,7 +399,7 @@
                         <i class="fas fa-hand-holding-heart fa-3x mb-3" style="color: #1e90ff;"></i>
                         <h5 class="card-title mb-3" style="font-weight: 600; font-size: 1.25rem;">Quiero recibir asesoría</h5>
                         <p style="color: #444;">¿Tienes dudas o quieres reforzar una materia? Regístrate y encuentra el apoyo que necesitas.</p>
-                        <a href="#" class="btn btn-outline-primary mt-4 px-4 py-2" style="border-radius: 30px; font-weight: 500;">Registrarme como asesorado</a>
+                        <a href="{{ route('register', ['rol' => 'ESTUDIANTE']) }}" class="btn btn-outline-primary mt-4 px-4 py-2" style="border-radius: 30px; font-weight: 500;">Registrarme como asesorado</a>
                     </div>
                 </div>
             </div>
@@ -304,11 +409,12 @@
                         <i class="fas fa-user-graduate fa-3x mb-3" style="color: #1e90ff;"></i>
                         <h5 class="card-title mb-3" style="font-weight: 600; font-size: 1.25rem;">Quiero ser asesor</h5>
                         <p style="color: #444;">¿Dominas alguna materia? Comparte tu experiencia y ayuda a otros estudiantes a tener éxito.</p>
-                        <a href="#" class="btn btn-primary mt-4 px-4 py-2" style="border-radius: 30px; font-weight: 500;">Registrarme como asesor</a>
+                        <a href="{{ route('register', ['rol' => 'ASESOR']) }}" class="btn btn-primary mt-4 px-4 py-2" style="border-radius: 30px; font-weight: 500;">Registrarme como asesor</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+@endguest
 @endsection

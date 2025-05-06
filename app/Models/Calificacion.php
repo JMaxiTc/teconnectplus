@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Calificacion extends Model
 {
@@ -12,8 +12,8 @@ class Calificacion extends Model
     protected $primaryKey='id_calificacion';
     public $incrementing=true;
     protected $keyType='int';
-    protected $puntuacion;
     protected $comentario;
-    protected $fillable=["puntuacion","comentario"];
+    protected $puntuacion;	
+    protected $fillable=["comentario","puntuacion"];
     public $timestamps=false;
 }

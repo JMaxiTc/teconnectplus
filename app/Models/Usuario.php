@@ -2,23 +2,54 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
-    use HasFactory;
+    use Notifiable;
+    
     protected $table='usuario';
     protected $primaryKey='id_usuario';
-    public $incrementing=true;
+    public $incrementing=false; // Cambiar a false para indicar que el ID no es autoincremental
     protected $keyType='int';
-    protected $nombre;
-    protected $apellido;
-    protected $correo;
-    protected $fechaNacimiento;
-    protected $genero;
-    protected $rol;
-    protected $semestre;
-    protected $fillable=["nombre","apellido", "correo", "fechaNacimiento", "genero", "rol", "semestre"];
+    protected $fillable=["id_usuario", "nombre","apellido", "correo", "fechaNacimiento", "id_genero", "rol", "semestre", "password"]; // Añadir id_usuario
     public $timestamps=false;
+    
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+    ];
+    
+    /**
+     * Determine if user is an asesor
+     *
+     * @return bool
+     */
+    public function esAsesor()
+    {
+        return $this->rol === 'ASESOR';
+    }
+    
+    /**
+     * Determine if user is a student
+     *
+     * @return bool
+     */
+    public function esEstudiante()
+    {
+        return $this->rol === 'ESTUDIANTE';
+    }
+    
+    /**
+     * Get the gender that owns the user.
+     */
+    public function genero()
+    {
+        return $this->belongsTo(Genero::class, 'id_genero', 'id_genero');
+    }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Materia extends Model
 {
@@ -12,9 +12,9 @@ class Materia extends Model
     protected $primaryKey='id_materia';
     public $incrementing=true;
     protected $keyType='int';
-    protected $codigo;
-    protected $nombre;
     protected $descripcion;
-    protected $fillable=["codigo","nombre", "descripcion"];
+    protected $codigo;
+    protected $nombre;	
+    protected $fillable=["descripcion","codigo","nombre"];
     public $timestamps=false;
 }
