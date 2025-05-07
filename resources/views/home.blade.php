@@ -4,23 +4,31 @@
 @endcomponent
 
 @auth
-<div class="alert {{ Auth::user()->esAsesor() ? 'alert-primary' : 'alert-success' }} mb-4 shadow-sm">
+<div class="alert {{ Auth::user()->esAsesor() ? 'alert-primary' : (Auth::user()->esAdmin() ? 'alert-dark' : 'alert-success') }} mb-4 shadow-sm">
     <div class="d-flex align-items-center">
         <div class="flex-shrink-0">
             <i class="fas {{ Auth::user()->esAsesor() ? 'fa-chalkboard-teacher' : 'fa-user-graduate' }} fa-3x me-3"></i>
         </div>
         <div class="flex-grow-1">
             <h4 class="alert-heading">
-                {{ Auth::user()->esAsesor() ? '¡Bienvenido Asesor!' : '¡Bienvenido Estudiante!' }}
+                @if(Auth::user()->esAsesor())
+                    ¡Bienvenido Asesor!
+                @elseif(Auth::user()->esAdmin())
+                    ¡Bienvenido Administrador!
+                @else
+                    ¡Bienvenido Estudiante!
+                @endif
             </h4>
             <p class="mb-0">
-                <strong>{{ Auth::user()->nombre }} {{ Auth::user()->apellido }}</strong>
-                @if(Auth::user()->esAsesor())
-                    - Estás listo para compartir tu conocimiento y apoyar a otros estudiantes.
-                @else
-                    - Explora todas las asesorías disponibles y encuentra el apoyo académico que necesitas.
-                @endif
-            </p>
+        <strong>{{ Auth::user()->nombre }} {{ Auth::user()->apellido }}</strong>
+        @if(Auth::user()->esAsesor())
+            - Estás listo para compartir tu conocimiento y apoyar a otros estudiantes.
+        @elseif(Auth::user()->esAdmin())
+            - Tienes acceso completo al sistema para gestionar usuarios y configuraciones.
+        @else
+            - Explora todas las asesorías disponibles y encuentra el apoyo académico que necesitas.
+        @endif
+    </p>
         </div>
     </div>
 </div>
@@ -37,7 +45,7 @@
                     <div class="text-center mb-3">
                         <i class="fas fa-calendar-check fa-2x text-primary mb-2"></i>
                         <h6>Solicitudes Pendientes</h6>
-                        <span class="badge bg-danger">3</span>
+                        <span class="badge bg-danger">0</span>
                         <p class="small text-muted">Revisa tus solicitudes pendientes</p>
                         <a href="/solicitudes" class="btn btn-sm btn-outline-primary">Ver solicitudes</a>
                     </div>
@@ -94,6 +102,44 @@
                         <h6>Materiales de Estudio</h6>
                         <p class="small text-muted">Accede a materiales para tus materias</p>
                         <a href="/materiales" class="btn btn-sm btn-outline-success">Ver materiales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@if(Auth::user()->esAdmin())
+<div class="role-admin-only mb-4">
+    <div class="card border-dark">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Panel de Administrador</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-users-cog fa-2x text-dark mb-2"></i>
+                        <h6>Gestión de Usuarios</h6>
+                        <p class="small text-muted">Agrega, edita o elimina usuarios del sistema</p>
+                        <a href="/admin/usuarios" class="btn btn-sm btn-outline-dark">Administrar usuarios</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-database fa-2x text-dark mb-2"></i>
+                        <h6>Reportes del Sistema</h6>
+                        <p class="small text-muted">Consulta estadísticas y reportes generales</p>
+                        <a href="/admin/reportes" class="btn btn-sm btn-outline-dark">Ver reportes</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-cogs fa-2x text-dark mb-2"></i>
+                        <h6>Configuraciones</h6>
+                        <p class="small text-muted">Ajustes generales de la plataforma</p>
+                        <a href="/admin/configuracion" class="btn btn-sm btn-outline-dark">Configurar</a>
                     </div>
                 </div>
             </div>

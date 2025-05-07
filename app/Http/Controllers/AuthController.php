@@ -92,7 +92,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'fechaNacimiento' => 'required|date',
             'id_genero' => 'nullable|exists:genero,id_genero',
-            'rol' => ['required', Rule::in(['ESTUDIANTE', 'ASESOR'])],
+            'rol' => ['required', Rule::in(['ESTUDIANTE', 'ASESOR', 'ADMIN'])],
             'semestre' => 'required|integer|min:1|max:12',
         ]);
 

@@ -44,6 +44,16 @@ class Usuario extends Authenticatable
     {
         return $this->rol === 'ESTUDIANTE';
     }
+
+        /**
+     * Determine if user is a admin
+     *
+     * @return bool
+     */
+    public function esAdmin()
+    {
+        return $this->rol === 'ADMIN';
+    }
     
     /**
      * Get the gender that owns the user.
