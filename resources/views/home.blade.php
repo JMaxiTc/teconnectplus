@@ -1,7 +1,6 @@
 @extends("components.layout")
 @section("content")
-@component("components.breadcrumbs",["breadcrumbs"=>$breadcrumbs])
-@endcomponent
+
 
 @auth
 <div class="alert {{ Auth::user()->esAsesor() ? 'alert-primary' : (Auth::user()->esAdmin() ? 'alert-dark' : 'alert-success') }} mb-4 shadow-sm">
@@ -341,37 +340,20 @@
 <div class="container-fluid custom-container">
     <h2 class="section-title">Explora las materias disponibles</h2>
 
-    @php
-        $subjects = [
-            ["name" => "Programación orientada a objetos", "icon" => "fas fa-code", "route" => "/programacion-orientada-a-objetos"],
-            ["name" => "Contabilidad financiera", "icon" => "fas fa-calculator", "route" => "/contabilidad-financiera"],
-            ["name" => "Psicología general", "icon" => "fas fa-brain", "route" => "/psicologia-general"],
-            ["name" => "Anatomía básica", "icon" => "fas fa-user", "route" => "/anatomia-basica"],
-            ["name" => "Diseño arquitectónico", "icon" => "fas fa-drafting-compass", "route" => "/diseno-arquitectonico"],
-            ["name" => "Bases de datos", "icon" => "fas fa-database", "route" => "/bases-de-datos"],
-            ["name" => "Macroeconomía", "icon" => "fas fa-chart-line", "route" => "/macroeconomia"],
-            ["name" => "Neurociencia", "icon" => "fas fa-brain", "route" => "/neurociencia"],
-            ["name" => "Cálculo diferencial", "icon" => "fas fa-square-root-alt", "route" => "/calculo-diferencial"],
-            ["name" => "Historia del arte", "icon" => "fas fa-palette", "route" => "/historia-del-arte"],
-        ];
-    @endphp
-
     <div id="subjectsCarousel" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
-            @foreach(array_chunk($subjects, 3) as $chunkIndex => $subjectChunk)
+            @foreach($materias->chunk(3) as $chunkIndex => $chunk)
                 <div class="carousel-item {{ $chunkIndex == 0 ? 'active' : '' }}">
-                    @foreach($subjectChunk as $subject)
+                    @foreach($chunk as $materia)
                         <div>
                             <div class="card shadow-sm">
                                 <div class="card-body">
-                                    @if($subject['icon'])
-                                        <i class="{{ $subject['icon'] }} mb-3"></i>
-                                    @endif
-                                    <h5 class="card-title">{{ $subject['name'] }}</h5>
+                                    <i class="{{ $getIconForMateria($materia->nombre) }} mb-3 fa-2x"></i>
+                                    <h5 class="card-title">{{ $materia->nombre }}</h5>
                                     @auth
-                                    <a href="{{ $subject['route'] }}" class="btn btn-primary mt-auto">Ir</a>
+                                    <a href="{{ url('/materia/'.$materia->id_materia) }}" class="btn btn-primary mt-auto">Ir</a>
                                     @else
-                                    <a href="{{ route('login', ['redirect' => $subject['route']]) }}" class="btn btn-primary mt-auto">Ir</a>
+                                    <a href="{{ route('login', ['redirect' => '/materia/'.$materia->id_materia]) }}" class="btn btn-primary mt-auto">Ir</a>
                                     @endauth
                                 </div>
                             </div>

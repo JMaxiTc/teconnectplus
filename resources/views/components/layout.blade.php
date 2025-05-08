@@ -7,6 +7,7 @@
     <title>TeConnect+</title>
 
     <!-- Cargar Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ URL::asset('bootstrap-5.3.5-dist/css/bootstrap.min.css') }}" />
     <link href="{{ URL::asset('DataTables/datatables.min.css') }}" rel="stylesheet" />
     <link href="{{ URL::asset('assets/style.css') }}" rel="stylesheet" />

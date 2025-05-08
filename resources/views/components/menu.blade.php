@@ -22,6 +22,9 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->is('materiales*') ? 'active' : '' }}" href="/materiales">Materiales</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->is('materias*') ? 'active' : '' }}" href="{{ url('/catalogos/materias') }}">Materias</a>
+                    </li>
                     
                     <!-- Opciones específicas para asesores -->
                     @if(Auth::user()->esAsesor())
