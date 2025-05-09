@@ -4,9 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CatalogosController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function(){
-    return view('home', ["breadcrumbs" => []]);
+    return app(CatalogosController::class)->index();
 });
 
 // Rutas de autenticación
@@ -25,12 +26,13 @@ Route::middleware('auth')->group(function () {
     // Ruta para cerrar sesión
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::get('/', [CatalogosController::class, 'index']);
     Route::get('/catalogos/materias', [CatalogosController::class, 'materiasGet']);
     Route::get('/catalogos/materias/agregar', [CatalogosController::class, 'materiasAgregarGet']);
     Route::post('/catalogos/materias/agregar', [CatalogosController::class, 'materiasAgregarPost']);
     Route::get('/catalogos/materias/{id}/actualizar', [CatalogosController::class, 'materiasActualizarGet']);
     Route::post('/catalogos/materias/{id}/actualizar', [CatalogosController::class, 'materiasActualizarPost']);
+    Route::get('/catalogos/materias/{idMateria}/materiales', [CatalogosController::class, 'materialesGet'])->name('materiales.get');
+    Route::get('/perfil', [UserController::class, 'perfil'])->name('perfil');
 
     // Aquí puedes añadir otras rutas que requieran autenticación
     // como las rutas para asesorías y materiales

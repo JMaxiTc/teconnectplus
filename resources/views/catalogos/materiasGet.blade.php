@@ -5,9 +5,9 @@
 @endcomponent
 
 <div class="container mt-4">
-    <div class="row align-items-center">
+    <div class="row align-items-center mb-3">
         <div class="col">
-            <h1>Materias</h1>
+            <h1 class="fw-bold">Materias</h1>
         </div>
         @if(Auth::user()->esAdmin())
             <div class="col-auto">
@@ -17,68 +17,87 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success mt-3">
-            {{ session('success') }}
-        </div>
+        <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <!-- Contenedor para las tarjetas -->
-    <div class="row mt-4">
+    <div class="row g-4 mt-2">
         @foreach($materias as $materia)
-        <div class="col-md-4 mb-4 d-flex">
-            <!-- Tarjeta de Materia -->
-            <div class="card shadow-sm h-100 w-100 card-materia" >
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ $materia->nombre }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ $materia->codigo }}</h6>
-                    <p class="card-text flex-grow-1">{{ $materia->descripcion }}</p>
-                    <div class="d-flex justify-content-between mt-3">
-                        @if(Auth::user()->esAdmin())
-                            <a href="{{ url('/catalogos/materias/' . $materia->id_materia . '/actualizar') }}" class="btn btn-warning btn-sm">Actualizar</a>
-                        @endif
-                        <a href="{{ url('/catalogos/materias/' . $materia->id_materia . '/materiales') }}" class="btn btn-info btn-sm">Materiales</a>
-                    </div>
+        <div class="col-md-6 col-lg-4 d-flex">
+            <div class="card card-materia flex-fill shadow-sm">
+                <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #004085, #0069d9); color: white;">
+                    <i class="{{ App\Helpers\MateriaHelper::getIconForMateria($materia->nombre) }} fa-3x mb-2"></i>
+                    <h5 class="card-title mb-0">{{ $materia->nombre }}</h5>
+                </div>
+                <div class="card-body p-3">
+                    <p class="card-text text-muted mb-2">{{ $materia->descripcion }}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center bg-transparent px-3 py-3">
+                    <a href="{{ url('/catalogos/materias/' . $materia->id_materia . '/materiales') }}" class="btn btn-outline-primary rounded-pill px-3">
+                        Ver Materiales
+                    </a>
+                    @if(Auth::user()->esAdmin())
+                        <a href="{{ url('/catalogos/materias/' . $materia->id_materia . '/actualizar') }}" class="btn btn-outline-secondary rounded-pill px-3">
+                            Actualizar
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
         @endforeach
-
     </div>
 </div>
+
 <style>
     .card-materia {
-        min-height: 80px;
-        max-height: 240px;
-        width: 100%;
-        border-radius: 12px;
-        border: 1px solid #ddd;
-        background-color: #fff; /* conserva tu color blanco */
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        border: none;
+        border-radius: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
     .card-materia:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-6px);
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.1);
     }
 
     .card-title {
-        font-size: 1.1rem;
+        font-size: 1.25rem;
         font-weight: 600;
     }
 
-    .card-subtitle {
-        font-size: 0.9rem;
+    .card-text {
+        font-size: 0.95rem;
         color: #6c757d;
     }
 
-    .card-text {
-        font-size: 0.85rem;
-        color: #444;
+    .btn-outline-primary,
+    .btn-outline-secondary {
+        border-width: 2px;
+        font-weight: 500;
     }
 
-    .btn {
-        font-size: 0.8rem;
+    .btn-outline-primary:hover {
+        background-color: #0069d9;
+        color: white;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-agregar {
+        background-color: #198754;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 0.5rem;
+    }
+
+    .btn-agregar:hover {
+        background-color: #157347;
     }
 </style>
-
 @endsection

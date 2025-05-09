@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Materia;
 use Illuminate\View\View;
 use App\Helpers\MateriaHelper;
+use App\Models\Recurso;
 
 class CatalogosController extends Controller
 {
@@ -90,5 +91,21 @@ class CatalogosController extends Controller
         $materia->save();
 
         return redirect('/catalogos/materias')->with('success', 'Materia actualizada correctamente.');
+    }
+
+    public function materialesGet($idMateria)
+{
+    $materia = Materia::findOrFail($idMateria); // Obtener la materia por ID
+    $materiales = Recurso::where('fk_id_materia', $idMateria)->get(); // Obtener los materiales relacionados
+
+    return view('catalogos.materialesGet', [ // Cambiar a la vista correcta
+        "materia" => $materia,
+        "materiales" => $materiales,
+        "breadcrumbs" => [
+            "Inicio" => url("/"),
+            "Materias" => url("/catalogos/materias"),
+            "Materiales" => url("/catalogos/materias/{$idMateria}/materiales")
+        ]
+    ]);
     }
 }

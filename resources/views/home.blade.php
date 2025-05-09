@@ -353,7 +353,7 @@
                                     @auth
                                     <a href="{{ url('/materia/'.$materia->id_materia) }}" class="btn btn-primary mt-auto">Ir</a>
                                     @else
-                                    <a href="{{ route('login', ['redirect' => '/materia/'.$materia->id_materia]) }}" class="btn btn-primary mt-auto">Ir</a>
+                                    <a href="{{ url('login', ['redirect' => '/materia/'.$materia->id_materia]) }}" class="btn btn-primary mt-auto">Ir</a>
                                     @endauth
                                 </div>
                             </div>
