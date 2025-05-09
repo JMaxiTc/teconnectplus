@@ -108,4 +108,73 @@ class CatalogosController extends Controller
         ]
     ]);
     }
+
+    public function guardar(Request $request)
+{
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'tipo' => 'required|string|in:documento,video,enlace',
+        'archivo' => 'nullable|file|max:10240', // 10MB
+        'url' => 'nullable|url',
+        'id_materia' => 'required|exists:materia,id_materia',
+    ]);
+
+    $recurso = new Recurso();
+    $recurso->nombre = $request->nombre;
+    $recurso->tipo = $request->tipo;
+    $recurso->fechaSubida = now();
+
+    if ($request->tipo === 'enlace') {
+        $recurso->url = $request->url;
+        $recurso->tamaño = 0;
+    } else {
+        $archivo = $request->file('archivo');
+        $ruta = $archivo->store('materiales', 'public');
+        $recurso->url = 'storage/' . $ruta;
+        $recurso->tamaño = $archivo->getSize();
+    }
+
+    $recurso->fk_id_materia = $request->id_materia;
+    $recurso->save();
+
+    return redirect()->back()->with('success', '¡Material agregado correctamente!');
+}
+
+public function materialesTodosGet(Request $request)
+{
+    $query = Recurso::with('materia');
+
+    if ($request->filled('materia')) {
+        $query->where('fk_id_materia', $request->materia);
+    }
+
+    if ($request->filled('tipo')) {
+        $query->where('tipo', $request->tipo);
+    }
+
+    if ($request->filled('busqueda')) {
+        $query->where('nombre', 'like', '%' . $request->busqueda . '%');
+    }
+
+    // Ordenar por 'fechaSubida' o cualquier otra columna que prefieras
+    $materiales = $query->orderBy('fechaSubida', 'desc')->paginate(9);
+
+    // Obtener las materias para los filtros
+    $materias = Materia::orderBy('nombre')->get();
+
+    return view('catalogos.materialesAll', [ // Cambiar a la vista correcta
+        "materias" => $materias,
+        "materiales" => $materiales,
+        "query" => $query,
+        "breadcrumbs" => [
+            "Inicio" => url("/"),
+            "Materiales" => url("/catalogos/materiales")
+        ]
+    ]);
+}
+
+
+
+
+
 }

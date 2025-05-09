@@ -31,7 +31,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/catalogos/materias/agregar', [CatalogosController::class, 'materiasAgregarPost']);
     Route::get('/catalogos/materias/{id}/actualizar', [CatalogosController::class, 'materiasActualizarGet']);
     Route::post('/catalogos/materias/{id}/actualizar', [CatalogosController::class, 'materiasActualizarPost']);
+    Route::get('/materiales', [CatalogosController::class, 'materialesTodosGet'])->name('materiales.todos');
     Route::get('/catalogos/materias/{idMateria}/materiales', [CatalogosController::class, 'materialesGet'])->name('materiales.get');
+    Route::post('/materiales/guardar', [CatalogosController::class, 'guardar'])->name('materiales.guardar');
+
     Route::get('/perfil', [UserController::class, 'perfil'])->name('perfil');
 
     // Aquí puedes añadir otras rutas que requieran autenticación
