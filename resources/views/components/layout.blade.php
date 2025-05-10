@@ -25,6 +25,8 @@
         
         <div class="flex-grow-1 main-content p-4">
             @yield('content') <!-- Aquí va el contenido de cada vista -->
+            @include('components.notificacion-modal')
+
         </div>
     </div>
 

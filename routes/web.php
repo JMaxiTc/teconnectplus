@@ -35,7 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/catalogos/materias/{idMateria}/materiales', [CatalogosController::class, 'materialesGet'])->name('materiales.get');
     Route::post('/materiales/guardar', [CatalogosController::class, 'guardar'])->name('materiales.guardar');
 
-    Route::get('/perfil', [UserController::class, 'perfil'])->name('perfil');
+    Route::get('perfil', [UserController::class, 'perfil'])->name('perfil.show');
+    Route::post('perfil/{id_usuario}/actualizar', [UserController::class, 'actualizar'])->name('perfil.update');
+    
 
     // Aquí puedes añadir otras rutas que requieran autenticación
     // como las rutas para asesorías y materiales

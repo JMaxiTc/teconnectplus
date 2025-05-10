@@ -94,3 +94,49 @@ ESTILO PARA BOTONES
     transform: scale(0.98);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+
+/*
+ESTILO PARA MI PERFIL
+*/
+
+.bg-panel {
+        background-color: #198754; /* Verde institucional */
+        color: white;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+}
+
+.info-card {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+}
+
+.info-header {
+        font-weight: bold;
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        color: #198754;
+}
+
+.info-item {
+        margin-bottom: 1.25rem;
+}
+
+.info-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+}
+
+.info-value {
+        font-size: 1.05rem;
+        color: #212529;
+        font-weight: 500;
+}
+
+

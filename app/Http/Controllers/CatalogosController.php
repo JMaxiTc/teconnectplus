@@ -59,8 +59,9 @@ class CatalogosController extends Controller
             'nombre' => strtoupper($request->nombre),
             'descripcion' => ucfirst($request->descripcion),
         ]);
-
-        return redirect('/catalogos/materias')->with('success', 'Materia agregada correctamente.');
+        session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
+        session()->flash('mensaje', '¡Materia agregada correctamente!');
+        return redirect('/catalogos/materias');
     }
 
     public function materiasActualizarGet($id)
@@ -89,8 +90,10 @@ class CatalogosController extends Controller
         $materia->nombre = strtoupper($request->nombre);
         $materia->descripcion = ucfirst($request->descripcion);
         $materia->save();
-
-        return redirect('/catalogos/materias')->with('success', 'Materia actualizada correctamente.');
+        
+        session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
+        session()->flash('mensaje', '¡Materia actualizada correctamente!');
+        return redirect('/catalogos/materias');
     }
 
     public function materialesGet($idMateria)
@@ -137,7 +140,9 @@ class CatalogosController extends Controller
     $recurso->fk_id_materia = $request->id_materia;
     $recurso->save();
 
-    return redirect()->back()->with('success', '¡Material agregado correctamente!');
+    session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
+    session()->flash('mensaje', '¡Material agregado correctamente!');
+    return redirect()->back();
 }
 
 public function materialesTodosGet(Request $request)

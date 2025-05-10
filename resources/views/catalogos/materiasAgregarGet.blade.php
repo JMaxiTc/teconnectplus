@@ -32,7 +32,9 @@
 
         <div class="mb-3">
             <label for="descripcion" class="form-label">Descripción</label>
-            <textarea class="form-control" id="descripcion" name="descripcion" rows="3">{{ old('descripcion') }}</textarea>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" maxlength="80" oninput="validarLongitud()">{{ old('descripcion') }}</textarea>
+            <small id="descripcionHelp" class="form-text text-muted">Máximo 80 caracteres.</small>
+            <div id="mensajeError" class="text-danger" style="display:none;">La descripción es demasiado larga.</div>
         </div>
 
         <button type="submit" class="btn btn-primary">Agregar</button>

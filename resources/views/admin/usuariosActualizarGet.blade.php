@@ -1,93 +1,83 @@
-@extends("components.layout")
-@section('content')
-@component("components.breadcrumbs",["breadcrumbs"=>$breadcrumbs])
-@endcomponent
-<div class="container">
-    <h2 class="mb-4">Editar Usuario</h2>
+@extends('components.layout')
 
-    <form action="{{ url('/admin/usuarios/' . $user->id_usuario . '/actualizar') }}" method="POST">
+@section('content')
+@component("components.breadcrumbs", ["breadcrumbs" => $breadcrumbs])
+@endcomponent
+
+<div class="container mt-4">
+
+    <!-- Panel de bienvenida -->
+    <div class="bg-panel d-flex align-items-center gap-3">
+        <i class="bi bi-person-circle fs-2"></i>
+        <div>
+            <h4 class="mb-0">Actualizar datos de {{ $user->nombre }}!</h4>
+            <p class="mb-0">Aquí podras modificar los datos del usuario.</p>
+        </div>
+    </div>
+
+    <!-- Tarjeta de información -->
+    <form action="{{ url('/admin/usuarios/' . $user->id_usuario . '/actualizar') }}" method="POST" class="info-card mt-4">
         @csrf
 
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control @error('nombre') is-invalid @enderror" id="nombre" name="nombre" value="{{ old('nombre', $user->nombre) }}">
-            @error('nombre')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+        <div class="info-header">Detalles de la Cuenta</div>
+
+        <!-- Nombre completo (solo lectura) -->
+        <div class="info-item">
+            <div class="info-label">Nombre Completo</div>
+            <div class="info-value">{{ $user->nombre }} {{ $user->apellido }}</div>
         </div>
 
-        <div class="mb-3">
-            <label for="apellido" class="form-label">Apellido</label>
-            <input type="text" class="form-control @error('apellido') is-invalid @enderror" id="apellido" name="apellido" value="{{ old('apellido', $user->apellido) }}">
-            @error('apellido')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+        <!-- Fecha de nacimiento (solo lectura) -->
+        <div class="info-item">
+            <div class="info-label">Fecha de Nacimiento</div>
+            <div class="info-value">{{ $user->fechaNacimiento }}</div>
         </div>
 
-        <div class="mb-3">
-            <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
-            <input type="date" class="form-control @error('fechaNacimiento') is-invalid @enderror" id="fechaNacimiento" name="fechaNacimiento" value="{{ old('fechaNacimiento', $user->fechaNacimiento) }}">
-            @error('fechaNacimiento')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+        <!-- Semestre (solo lectura) -->
+        <div class="info-item">
+            <div class="info-label">Semestre</div>
+            <div class="info-value">{{ $user->semestre }}</div>
         </div>
 
-        <div class="mb-3">
-            <label for="id_genero" class="form-label">Género</label>
-            <select class="form-control @error('id_genero') is-invalid @enderror" id="id_genero" name="id_genero">
-                <option value="1" {{ old('id_genero', $user->id_genero) == 1 ? 'selected' : '' }}>Masculino</option>
-                <option value="2" {{ old('id_genero', $user->id_genero) == 2 ? 'selected' : '' }}>Femenino</option>
-                <option value="3" {{ old('id_genero', $user->id_genero) == 3 ? 'selected' : '' }}>No binario</option>
-                <option value="4" {{ old('id_genero', $user->id_genero) == 4 ? 'selected' : '' }}>Prefiero no decirlo</option>
-            </select>
-            @error('id_genero')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+        <!-- Género (solo lectura) -->
+        <div class="info-item">
+            <div class="info-label">Género</div>
+            <div class="info-value">{{ $user->genero->genero }}</div>
         </div>
 
-        <div class="mb-3">
-            <label for="rol" class="form-label">Rol</label>
-            <select class="form-control @error('rol') is-invalid @enderror" id="rol" name="rol">
-                <option value="ADMIN" {{ old('rol', $user->rol) == 'ADMIN' ? 'selected' : '' }}>ADMIN</option>
-                <option value="ASESOR" {{ old('rol', $user->rol) == 'ASESOR' ? 'selected' : '' }}>ASESOR</option>
-                <option value="ESTUDIANTE" {{ old('rol', $user->rol) == 'ESTUDIANTE' ? 'selected' : '' }}>ESTUDIANTE</option>
-            </select>
-            @error('rol')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+        <!-- Rol (solo lectura) -->
+        <div class="info-item">
+            <div class="info-label">Rol</div>
+            <div class="info-value">{{ $user->rol }}</div>
         </div>
 
-        <div class="mb-3">
-            <label for="semestre" class="form-label">Semestre</label>
-            <input type="number" class="form-control @error('semestre') is-invalid @enderror" id="semestre" name="semestre" value="{{ old('semestre', $user->semestre) }}" min="1" max="12">
-            @error('semestre')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="mb-3">
-            <label for="correo" class="form-label">Correo</label>
-            <input type="email" class="form-control @error('correo') is-invalid @enderror" id="correo" name="correo" value="{{ old('correo', $user->correo) }}">
+        <!-- Correo (editable) -->
+        <div class="info-item">
+            <div class="info-label">Correo</div>
+            <input type="email" class="form-control @error('correo') is-invalid @enderror" name="correo" value="{{ old('correo', $user->correo) }}">
             @error('correo')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
-        <div class="mb-3">
-            <label for="password" class="form-label">Nueva Contraseña (opcional)</label>
-            <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password">
+        <!-- Nueva contraseña (editable) -->
+        <div class="info-item">
+            <div class="info-label">Nueva Contraseña (opcional)</div>
+            <input type="password" class="form-control @error('password') is-invalid @enderror" name="password">
             @error('password')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
-        <div class="mb-3">
-            <label for="password_confirmation" class="form-label">Confirmar Nueva Contraseña</label>
-            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
+        <!-- Confirmar nueva contraseña (editable) -->
+        <div class="info-item">
+            <div class="info-label">Confirmar Nueva Contraseña</div>
+            <input type="password" class="form-control" name="password_confirmation">
         </div>
 
-
-        <button type="submit" class="btn btn-success">Actualizar Usuario</button>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success">Actualizar Usuario</button>
+        </div>
     </form>
 </div>
 @endsection

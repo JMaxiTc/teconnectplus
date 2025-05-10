@@ -25,9 +25,11 @@
             @endif
 
             <!-- Botón para mostrar formulario -->
+             @if(Auth::user()->esAdmin() || Auth::user()->esAsesor())
             <div class="text-end mb-3">
-                <button id="btnMostrarFormulario" class="btn btn-primary">Agregar</button>
+                <button id="btnMostrarFormulario" class="btn btn-agregar">Agregar</button>
             </div>
+            @endif
 
             <!-- Formulario oculto -->
             <div id="formularioMaterial" class="card mb-4 shadow border-0" style="display: none;">

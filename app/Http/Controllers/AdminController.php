@@ -61,8 +61,9 @@ class AdminController extends Controller
             'correo' => $request->correo,
             'password' => Hash::make($request->password),
         ]);
-    
-        return redirect('/admin/usuarios')->with('success', 'Usuario creado exitosamente');
+        session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
+        session()->flash('mensaje', '¡Usuario agregado correctamente!');
+        return redirect('/admin/usuarios');
     }
 
     // Mostrar formulario para editar un usuario
@@ -82,38 +83,33 @@ class AdminController extends Controller
 
     // Actualizar los datos del usuario
     public function usuariosActualizarPost(Request $request, $id_usuario)
-{
-    // Obtener al usuario por ID
-    $user = Usuario::findOrFail($id_usuario);
+    {
+        // Obtener al usuario por ID
+        $user = Usuario::findOrFail($id_usuario);
 
-    // Validación de los datos del formulario
-    $request->validate([
-        'nombre' => 'required|string|max:255',
-        'apellido' => 'required|string|max:255',
-        'fechaNacimiento' => 'required|date',
-        'id_genero' => 'required|integer|exists:genero,id_genero',
-        'rol' => 'required|in:ADMIN,ASESOR,ESTUDIANTE',
-        'semestre' => 'required|integer|min:1|max:12',
-        'correo' => 'required|email|unique:usuario,correo,' . $user->id_usuario . ',id_usuario',
-        'password' => 'nullable|string|min:8|confirmed',
-    ]);
+        // Validación de los datos del formulario
+        $request->validate([
+            'correo' => 'required|email|unique:usuario,correo,' . $user->id_usuario . ',id_usuario',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
 
-    // Solo obtener los campos que se deben actualizar
-    $datos = $request->only([
-        'nombre', 'apellido', 'fechaNacimiento',
-        'id_genero', 'rol', 'semestre', 'correo'
-    ]);
+        // Solo obtener los campos que se deben actualizar
+        $datos = $request->only([
+            'correo'
+        ]);
 
-    // Si se proporciona una nueva contraseña, agregarla al array de datos
-    if ($request->filled('password')) {
-        $datos['password'] = Hash::make($request->password);
+        // Si se proporciona una nueva contraseña, agregarla al array de datos
+        if ($request->filled('password')) {
+            $datos['password'] = Hash::make($request->password);
+        }
+
+        // Actualizar el usuario con los datos nuevos
+        $user->update($datos);
+
+        // Redirigir con mensaje de éxito
+        session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
+        session()->flash('mensaje', '¡Usuario actualizado correctamente!');
+        return redirect('/admin/usuarios');
     }
-
-    // Actualizar el usuario con los datos nuevos
-    $user->update($datos);
-
-    // Redirigir con mensaje de éxito
-    return redirect('/admin/usuarios')->with('success', 'Usuario actualizado exitosamente');
-}
 
 }

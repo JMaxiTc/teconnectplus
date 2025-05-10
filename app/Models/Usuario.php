@@ -13,7 +13,7 @@ class Usuario extends Authenticatable
     protected $primaryKey='id_usuario';
     public $incrementing=false; // Cambiar a false para indicar que el ID no es autoincremental
     protected $keyType='int';
-    protected $fillable=["id_usuario", "nombre","apellido", "correo", "fechaNacimiento", "id_genero", "rol", "semestre", "password"]; // Añadir id_usuario
+    protected $fillable=["id_usuario", "nombre","apellido", "carrera", "correo", "fechaNacimiento", "id_genero", "rol", "semestre", "password"]; // Añadir id_usuario
     public $timestamps=false;
     
     /**
