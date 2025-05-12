@@ -133,7 +133,7 @@
     }
     .tipo-material.documento { background-color: #007bff; }
     .tipo-material.video { background-color: #dc3545; }
-    .tipo-material.enlace { background-color: #28a745; }
+    .tipo-material.enlace { background-color:rgb(142, 142, 142); }
     .text-dark-blue {
         color: #001f3f;
         font-weight: 600;

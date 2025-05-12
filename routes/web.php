@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CatalogosController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AsesoriasController;
+use App\Http\Controllers\AsesorMateriaController;
 
 Route::get('/', function(){
     return app(CatalogosController::class)->index();
@@ -49,3 +51,26 @@ Route::middleware('auth','can:ADMIN')->group(function () {
     Route::get('/admin/usuarios/{id_usuario}/actualizar', [AdminController::class, 'usuariosActualizarGet']);
     Route::post('/admin/usuarios/{id_usuario}/actualizar', [AdminController::class, 'usuariosActualizarPost']);
 });
+
+//Asesor mis materias
+Route::middleware('auth')->group(function () {
+    Route::get('asesor/mis-materias', [AsesorMateriaController::class, 'misMateriasGet'])->name('misMateriasGet');
+    Route::post('asesor/asignar-materia', [AsesorMateriaController::class, 'asignarMateriaPost'])->name('asignarMateriaPost');
+    Route::delete('asesor/eliminar-materia/{id}', [AsesorMateriaController::class, 'eliminarMateriaPost'])->name('eliminarMateriaPost');
+});
+
+
+
+// Estudiante
+Route::middleware(['auth'])->group(function () {
+    Route::get('/asesorias/solicitar', [AsesoriasController::class, 'estudianteSolicitarGet'])->name('asesorias.solicitar.get');
+    Route::post('/asesorias/solicitar', [AsesoriasController::class, 'estudianteSolicitarPost'])->name('asesorias.solicitar.post');
+    Route::get('/asesorias/asesores/{id_materia}', [AsesoriasController::class, 'asesoresPorMateria'])->name('asesorias.asesores');
+});
+
+// Asesor
+Route::middleware(['auth'])->group(function () {
+    Route::get('/asesorias/solicitudes', [AsesoriasController::class, 'asesorSolicitudesGet'])->name('asesorias.solicitudes.get');
+    Route::post('/asesorias/actualizar/{id}', [AsesoriasController::class, 'actualizarEstado'])->name('asesorias.actualizar');
+});
+

@@ -34,7 +34,7 @@
                             </a>
                         </li>
                         <li class="nav-item role-asesor-only">
-                            <a class="nav-link {{ request()->is('solicitudes*') ? 'active' : '' }}" href="/solicitudes">
+                            <a class="nav-link {{ request()->is('solicitudes*') ? 'active' : '' }}" href="/asesorias/solicitudes">
                                 <i class="fas fa-clipboard-list me-1"></i>Solicitudes
                             </a>
                         </li>

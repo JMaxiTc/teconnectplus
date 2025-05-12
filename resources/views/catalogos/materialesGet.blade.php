@@ -205,7 +205,7 @@
     }
 
     .tipo-material.enlace {
-        background-color: #28a745;
+        background-color:rgb(140, 140, 140);
     }
 
     .text-dark-blue {

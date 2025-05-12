@@ -62,4 +62,27 @@ class Usuario extends Authenticatable
     {
         return $this->belongsTo(Genero::class, 'id_genero', 'id_genero');
     }
+
+    public function materias()
+{
+    return $this->belongsToMany(Materia::class, 'asesor_materia', 'fk_id_asesor', 'fk_id_materia');
+}
+
+/**
+ * Get pending asesorias for this user (when is an asesor)
+ */
+public function solicitudesPendientes()
+{
+    return $this->hasMany(Asesoria::class, 'fk_id_asesor', 'id_usuario')
+        ->where('estado', 'pendiente');
+}
+
+/**
+ * Get all asesorias for this user (when is an asesor)
+ */
+public function asesorias()
+{
+    return $this->hasMany(Asesoria::class, 'fk_id_asesor', 'id_usuario');
+}
+
 }

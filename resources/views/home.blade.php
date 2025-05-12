@@ -43,10 +43,17 @@
                 <div class="col-md-4">
                     <div class="text-center mb-3">
                         <i class="fas fa-calendar-check fa-2x text-primary mb-2"></i>
-                        <h6>Solicitudes Pendientes</h6>
-                        <span class="badge bg-danger">0</span>
+                        <h6>
+                            Solicitudes Pendientes
+                            @php
+                                $pendientes = Auth::user()->solicitudesPendientes()->count();
+                            @endphp
+                            @if($pendientes > 0)
+                                <span class="badge bg-danger rounded-pill">{{ $pendientes }}</span>
+                            @endif
+                        </h6>
                         <p class="small text-muted">Revisa tus solicitudes pendientes</p>
-                        <a href="/solicitudes" class="btn btn-sm btn-outline-primary">Ver solicitudes</a>
+                        <a href="{{ route('asesorias.solicitudes.get') }}" class="btn btn-sm btn-outline-primary">Ver solicitudes</a>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -54,7 +61,7 @@
                         <i class="fas fa-book fa-2x text-primary mb-2"></i>
                         <h6>Mis Materias</h6>
                         <p class="small text-muted">Gestiona las materias que puedes asesorar</p>
-                        <a href="/mis-materias" class="btn btn-sm btn-outline-primary">Gestionar</a>
+                        <a href="{{ route('misMateriasGet') }}" class="btn btn-sm btn-outline-primary">Gestionar</a>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -84,7 +91,7 @@
                         <i class="fas fa-search fa-2x text-success mb-2"></i>
                         <h6>Buscar Asesor</h6>
                         <p class="small text-muted">Encuentra asesorías para tus materias</p>
-                        <a href="/buscar-asesor" class="btn btn-sm btn-outline-success">Buscar</a>
+                        <a href="/asesorias/solicitar" class="btn btn-sm btn-outline-success">Buscar</a>
                     </div>
                 </div>
                 <div class="col-md-4">
