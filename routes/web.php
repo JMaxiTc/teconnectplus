@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AsesoriasController;
 use App\Http\Controllers\AsesorMateriaController;
+use App\Http\Controllers\VideollamadaController;
 
 Route::get('/', function(){
     return app(CatalogosController::class)->index();
@@ -53,7 +54,7 @@ Route::middleware('auth','can:ADMIN')->group(function () {
 });
 
 //Asesor mis materias
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'can:ASESOR')->group(function () {
     Route::get('asesor/mis-materias', [AsesorMateriaController::class, 'misMateriasGet'])->name('misMateriasGet');
     Route::post('asesor/asignar-materia', [AsesorMateriaController::class, 'asignarMateriaPost'])->name('asignarMateriaPost');
     Route::delete('asesor/eliminar-materia/{id}', [AsesorMateriaController::class, 'eliminarMateriaPost'])->name('eliminarMateriaPost');
@@ -62,15 +63,49 @@ Route::middleware('auth')->group(function () {
 
 
 // Estudiante
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'can:ESTUDIANTE'])->group(function () {
+    // Solicitar asesoría
     Route::get('/asesorias/solicitar', [AsesoriasController::class, 'estudianteSolicitarGet'])->name('asesorias.solicitar.get');
     Route::post('/asesorias/solicitar', [AsesoriasController::class, 'estudianteSolicitarPost'])->name('asesorias.solicitar.post');
     Route::get('/asesorias/asesores/{id_materia}', [AsesoriasController::class, 'asesoresPorMateria'])->name('asesorias.asesores');
+    
+    // Asesorías Activas (CONFIRMADA, PROCESO) - Página principal
+    Route::get('/asesorias', [AsesoriasController::class, 'estudianteAsesoriasActivasGet'])->name('asesorias.index');
+    
+    // Solicitudes pendientes (PENDIENTE)
+    Route::get('/asesorias/pendientes', [AsesoriasController::class, 'estudianteSolicitudesPendientesGet'])->name('asesorias.pendientes.get');
+    
+    // Historial (CANCELADA, FINALIZADA)
+    Route::get('/asesorias/historial', [AsesoriasController::class, 'estudianteHistorialGet'])->name('asesorias.historial.get');
+    
+    // Detalle de asesoría
+    Route::get('/asesorias/detalle/{id}', [AsesoriasController::class, 'estudianteDetalleAsesoriaGet'])->name('asesorias.detalle.get');
 });
 
 // Asesor
-Route::middleware(['auth'])->group(function () {
-    Route::get('/asesorias/solicitudes', [AsesoriasController::class, 'asesorSolicitudesGet'])->name('asesorias.solicitudes.get');
-    Route::post('/asesorias/actualizar/{id}', [AsesoriasController::class, 'actualizarEstado'])->name('asesorias.actualizar');
+Route::middleware(['auth', 'can:ASESOR'])->group(function () {
+    // Asesorías Activas (CONFIRMADA, PROCESO) - Página principal
+    Route::get('/asesoriasa/activas', [AsesoriasController::class, 'asesoriasActivasGet'])->name('asesoriasa.activas.get');
+    
+    // Solicitudes (PENDIENTE)
+    Route::get('/asesoriasa/solicitudes', [AsesoriasController::class, 'solicitudesPendientesGet'])->name('asesoriasa.solicitudes.get');
+    Route::get('/asesoriasa/solicitudes/count', [AsesoriasController::class, 'countPendingSolicitudes'])->name('asesoriasa.solicitudes.count');
+    
+    // Historial (CANCELADA, FINALIZADA)
+    Route::get('/asesoriasa/historial', [AsesoriasController::class, 'todasAsesoriasGet'])->name('asesoriasa.historial.get');
+    
+    // Detalle de asesoría
+    Route::get('/asesoriasa/detalle/{id}', [AsesoriasController::class, 'detalleAsesoriaGet'])->name('asesoriasa.detalle.get');
+    
+    // Actualizar estado de asesoría
+    Route::post('/asesoriasa/actualizar/{id}', [AsesoriasController::class, 'actualizarEstado'])->name('asesoriasa.actualizar');
+    
+    // Guardar enlace de reunión de Meet (solo asesores pueden hacerlo)
+    Route::post('/asesoriasa/guardar-meet', [AsesoriasController::class, 'guardarEnlaceMeet'])->name('asesoriasa.guardar.meet');
+    
+    // Redirección por defecto a asesorías activas
+    Route::get('/asesoriasa', function() {
+        return redirect()->route('asesoriasa.activas.get');
+    })->name('asesoriasa.index');
 });
 

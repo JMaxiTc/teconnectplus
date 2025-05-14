@@ -21,7 +21,7 @@ class Asesoria extends Model
     protected $fk_id_materia;
     protected $fk_id_calificacion;
     protected $fk_id_recurso;	
-    protected $fillable=["duracion","estado","fecha","tema","fk_id_asesor","fk_id_estudiante","fk_id_materia","fk_id_calificacion","fk_id_recurso"];
+    protected $fillable=["duracion","estado","fecha","tema","fk_id_asesor","fk_id_estudiante","fk_id_materia","fk_id_calificacion","fk_id_recurso","videoconference_url","meet_code"];
     public $timestamps=false;
 
     public function estudiante()

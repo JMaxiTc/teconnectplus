@@ -17,9 +17,6 @@
                 @auth
                     <!-- Opciones comunes para usuarios autenticados -->
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('asesorias*') ? 'active' : '' }}" href="/asesorias">Asesorías</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {{ request()->is('materiales*') ? 'active' : '' }}" href="/materiales">Materiales</a>
                     </li>
                     <li class="nav-item">
@@ -29,28 +26,52 @@
                     <!-- Opciones específicas para asesores -->
                     @if(Auth::user()->esAsesor())
                         <li class="nav-item role-asesor-only">
-                            <a class="nav-link {{ request()->is('mis-materias*') ? 'active' : '' }}" href="/mis-materias">
+                            <a class="nav-link {{ request()->is('mis-materias*') ? 'active' : '' }}" href="/asesor/mis-materias">
                                 <i class="fas fa-book-reader me-1"></i>Mis Materias
                             </a>
                         </li>
-                        <li class="nav-item role-asesor-only">
-                            <a class="nav-link {{ request()->is('solicitudes*') ? 'active' : '' }}" href="/asesorias/solicitudes">
-                                <i class="fas fa-clipboard-list me-1"></i>Solicitudes
+                        <li class="nav-item role-asesor-only dropdown">
+                            <a class="nav-link dropdown-toggle {{ request()->is('asesoriasa*') ? 'active' : '' }}" href="#" id="asesoriasDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-chalkboard-teacher me-1"></i>Asesorías
                             </a>
+                            <ul class="dropdown-menu" aria-labelledby="asesoriasDropdown">
+                                <li><a class="dropdown-item" href="{{ route('asesoriasa.activas.get') }}"><i class="fas fa-calendar-check me-1"></i>Asesorías Activas</a></li>
+                                <li><a class="dropdown-item" href="{{ route('asesoriasa.solicitudes.get') }}"><i class="fas fa-clipboard-list me-1"></i>Solicitudes <span id="menu-pending-count" class="badge bg-primary rounded-pill">0</span></a></li>
+                                <li><a class="dropdown-item" href="{{ route('asesoriasa.historial.get') }}"><i class="fas fa-history me-1"></i>Historial</a></li>
+                            </ul>
                         </li>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                fetch("{{ route('asesoriasa.solicitudes.count') }}")
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const badge = document.getElementById('menu-pending-count');
+                                        if (badge) {
+                                            badge.textContent = data.count;
+                                            if (data.count > 0) {
+                                                badge.classList.add('pulse');
+                                            }
+                                        }
+                                    });
+                            });
+                        </script>
                     @endif
                     
                     <!-- Opciones específicas para estudiantes -->
                     @if(Auth::user()->esEstudiante())
-                        <li class="nav-item role-estudiante-only">
-                            <a class="nav-link {{ request()->is('mis-asesorias*') ? 'active' : '' }}" href="/mis-asesorias">
-                                <i class="fas fa-calendar-check me-1"></i>Mis Asesorías
+                        <li class="nav-item role-estudiante-only dropdown">
+                            <a class="nav-link dropdown-toggle {{ request()->is('asesorias*') ? 'active' : '' }}" href="#" id="estudianteAsesoriasDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-chalkboard-teacher me-1"></i>Mis Asesorías
                             </a>
-                        </li>
-                        <li class="nav-item role-estudiante-only">
-                            <a class="nav-link {{ request()->is('buscar-asesor*') ? 'active' : '' }}" href="/buscar-asesor">
-                                <i class="fas fa-search me-1"></i>Buscar Asesor
-                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="estudianteAsesoriasDropdown">
+                                <li><a class="dropdown-item" href="{{ route('asesorias.index') }}"><i class="fas fa-calendar-check me-1"></i>Asesorías Activas</a></li>
+                                <li><a class="dropdown-item" href="{{ route('asesorias.pendientes.get') }}"><i class="fas fa-hourglass-half me-1"></i>Pendientes</a></li>
+                                <li><a class="dropdown-item" href="{{ route('asesorias.historial.get') }}"><i class="fas fa-history me-1"></i>Historial</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ route('asesorias.solicitar.get') }}"><i class="fas fa-plus me-1"></i>Solicitar Asesoría</a></li>
+                            </ul>
                         </li>
                     @endif
                     

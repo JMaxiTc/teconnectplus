@@ -1,6 +1,8 @@
 @extends('components.layout')
 
 @section('content')
+@component("components.breadcrumbs", ["breadcrumbs" => $breadcrumbs])
+@endcomponent
 <!-- Agregar enlaces a Flatpickr CSS y JS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
@@ -273,7 +275,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="d-flex justify-content-md-end justify-content-center gap-3">
-                                            <a href="/" class="btn btn-outline-secondary px-4">
+                                            <a href="/asesorias/mis-asesorias" class="btn btn-outline-secondary px-4">
                                                 <i class="fas fa-arrow-left me-2"></i>Cancelar
                                             </a>
                                             <button type="submit" class="btn btn-primary px-4 py-2 d-flex align-items-center gap-2">

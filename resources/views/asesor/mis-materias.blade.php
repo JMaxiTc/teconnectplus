@@ -1,6 +1,8 @@
 @extends('components.layout')
 
 @section('content')
+@component("components.breadcrumbs", ["breadcrumbs" => $breadcrumbs])
+@endcomponent
 <div class="header-container">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center">
@@ -119,124 +121,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    .card-materia {
-        border: none;
-        border-radius: 1rem;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        background-color: #fff;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
-    .card-materia:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-    }
-
-    .card-text {
-        font-size: 0.95rem;
-        color: #6c757d;
-    }
-
-    .btn-outline-primary,
-    .btn-outline-secondary,
-    .btn-outline-danger {
-        border-width: 2px;
-        font-weight: 500;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: #0069d9;
-        color: white;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #6c757d;
-        color: white;
-    }
-      .btn-outline-danger:hover {
-        background-color: #dc3545;
-        color: white;
-    }
-    
-    /* Estilos para el encabezado principal */
-    .header-container {
-        background: linear-gradient(135deg, #1a5276, #2980b9, #3498db);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-bottom: 25px;
-    }
-    
-    /* Estilos para los badges y efectos */
-    .badge {
-        font-weight: 500;
-        letter-spacing: 0.5px;
-    }
-    
-    /* Efecto de pulso para el contador */
-    @keyframes pulse {
-        0% {
-            box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
-        }
-        70% {
-            box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
-        }
-        100% {
-            box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
-        }
-    }
-      .badge.bg-primary {
-        animation: pulse 2s infinite;
-    }
-    
-    /* Estado vacío */
-    .empty-state {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 3rem 0;
-    }
-    
-    .empty-state-content {
-        text-align: center;
-        max-width: 400px;
-    }
-    
-    .empty-state-icon {
-        width: 80px;
-        height: 80px;
-        background-color: rgba(52, 152, 219, 0.1);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-    }
-    
-    .empty-state-icon i {
-        font-size: 2rem;
-        color: #3498db;
-    }
-    
-    .empty-state-title {
-        font-size: 1.5rem;
-        color: #2c3e50;
-        margin-bottom: 0.75rem;
-    }
-    
-    .empty-state-description {
-        color: #7f8c8d;
-        font-size: 1rem;
-    }
-</style>
-
 
 {{-- Script para manejar el botón de agregar materia --}}
 <script>

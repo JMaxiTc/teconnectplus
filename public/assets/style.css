@@ -127,16 +127,329 @@ ESTILO PARA MI PERFIL
         margin-bottom: 1.25rem;
 }
 
-.info-label {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin-bottom: 0.25rem;
-}
-
 .info-value {
         font-size: 1.05rem;
         color: #212529;
         font-weight: 500;
 }
 
+/* 
+Estilos para asesorias
+ */
+.card-asesoria {
+        border: none;
+        border-radius: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
 
+.card-asesoria:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.1);
+    }
+
+.card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+.card-text {
+        font-size: 0.95rem;
+        color: #6c757d;
+    }
+
+.empty-state {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem 0;
+    }
+
+.empty-state-content {
+        text-align: center;
+        max-width: 400px;
+    }
+
+.empty-state-icon {
+        width: 80px;
+        height: 80px;
+        background-color: rgba(52, 152, 219, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+.empty-state-icon i {
+        font-size: 2rem;
+        color: #3498db;
+    }
+
+.empty-state-title {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+
+.empty-state-description {
+        color: #7f8c8d;
+        font-size: 1rem;
+    }
+
+/* Efecto de pulso para el contador */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0);
+    }
+}
+
+.badge.bg-primary,
+.badge.bg-success {
+        animation: pulse 2s infinite;
+    }
+
+.card-materia {
+        border: none;
+        border-radius: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+.card-materia:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.1);
+    }
+
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-danger {
+        border-width: 2px;
+        font-weight: 500;
+    }
+
+.btn-outline-primary:hover {
+        background-color: #0069d9;
+        color: white;
+    }
+
+.btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+.btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+/* Estilos para el encabezado principal */
+.header-container {
+        background: linear-gradient(135deg, #1a5276, #2980b9, #3498db);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+    }
+    
+/* Estilos para los badges y efectos */
+.badge {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+ /* 
+ Estilos de cards mis asesorias 
+*/
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+    
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.25rem 1.5rem;
+    }
+
+    /* Estilos para tarjetas de solicitud */    
+    .solicitud-card {
+        position: relative;
+        border: none;
+        border-radius: 16px;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        overflow: hidden;
+    }
+    
+    .solicitud-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+    }
+      /* Encabezado principal de la vista */
+    .header-container {
+        background: linear-gradient(135deg, #1a5276, #2980b9, #3498db);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+    }    /* Header de la tarjeta */
+    .solicitud-card .card-header {
+        background: linear-gradient(135deg, #1a5276, #2980b9, #3498db);
+        border-bottom: none;
+        padding: 1.5rem 1rem;
+        text-align: center;
+    }
+    
+    .solicitud-card .card-title {
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: white;
+        margin: 0 auto;
+        word-wrap: break-word;
+        text-align: center;
+    }/* Estilos para la cinta (ribbon) */
+    .ribbon-wrapper {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 150px;
+        height: 150px;
+        overflow: hidden;
+        z-index: 5; /* Lower z-index so it doesn't interfere with the icon */
+    }
+    
+    .ribbon {
+        position: absolute;
+        top: 30px;
+        right: -40px;
+        background-color: #f39c12;
+        color: white;
+        padding: 5px 40px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transform: rotate(45deg);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Estilos para el contenido */
+    .info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+    
+    .info-item1 {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(52, 152, 219, 0.1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .info-icon i {
+        color: #3498db;
+        font-size: 1.2rem;
+    }
+    
+    .info-content {
+        flex: 1;
+    }
+    
+    .info-label {
+        display: block;
+        font-size: 0.8rem;
+        color: #7f8c8d;
+        margin-bottom: 0.2rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+    
+    .info-text {
+        margin: 0;
+        font-weight: 500;
+        color: #2c3e50;
+        font-size: 1rem;
+    }
+    
+    .info-subtext {
+        display: block;
+        font-size: 0.85rem;
+        color: #95a5a6;
+    }
+    
+    /* Footer y botones */
+    .card-footer {
+        background-color: #f9fafc;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.25rem;
+    }
+    
+    .btn-action {
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-accept {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .btn-accept:hover {
+        background-color: #219653;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(39, 174, 96, 0.2);
+    }
+    
+    .btn-reject {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .btn-reject:hover {
+        background-color: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(231, 76, 60, 0.2);
+    }
+    
+    /* Mejora en tarjetas para eventos táctiles */
+    @media (hover: none) {
+        .solicitud-card:active {
+            transform: scale(0.98);
+        }
+    }
+    
+    /* Fix para el icono de materia */
+    .solicitud-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 30px;
+        background: transparent;
+        z-index: 1;
+    }

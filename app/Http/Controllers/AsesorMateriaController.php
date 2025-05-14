@@ -22,7 +22,14 @@ class AsesorMateriaController extends Controller
         // Obtener todas las materias disponibles que aún no están asignadas
         $todasMaterias = Materia::all();
 
-        return view('asesor.mis-materias', compact('materiasAsignadas', 'todasMaterias'));
+        return view('asesor.mis-materias',[
+            'materiasAsignadas' => $materiasAsignadas,
+            'todasMaterias' => $todasMaterias,
+            'breadcrumbs' => [
+                'Inicio' => url('/'),
+                'Mis Materias' => url('/asesor/mis-materias')
+            ]
+        ]);
     }
 
     // Asigna una nueva materia al asesor
@@ -30,7 +37,7 @@ class AsesorMateriaController extends Controller
     {
         // Validar el formulario
         $request->validate([
-            'fk_id_materia' => 'required|exists:materias,id',
+            'fk_id_materia' => 'required|exists:materia,id_materia',
         ]);
 
         $asesorId = Auth::id();
@@ -48,8 +55,9 @@ class AsesorMateriaController extends Controller
                 'fk_id_materia' => $materiaId,
             ]);
         }
-
-        return redirect()->back()->with('success', 'Materia asignada correctamente.');
+        session()->flash('tipo', 'success'); 
+        session()->flash('mensaje', '¡Materia asignada correctamente!');
+        return redirect()->back();
     }
 
     // Eliminar una materia asignada
@@ -62,6 +70,8 @@ class AsesorMateriaController extends Controller
             ->where('fk_id_asesor', $asesorId)
             ->delete();
 
+        session()->flash('tipo', 'error');  // Tipo de mensaje: 'success', 'error', etc.
+        session()->flash('mensaje', '¡Materia eliminada!');
         return redirect()->back()->with('success', 'Materia eliminada correctamente.');
     }
 }

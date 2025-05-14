@@ -53,7 +53,7 @@
                             @endif
                         </h6>
                         <p class="small text-muted">Revisa tus solicitudes pendientes</p>
-                        <a href="{{ route('asesorias.solicitudes.get') }}" class="btn btn-sm btn-outline-primary">Ver solicitudes</a>
+                        <a href="{{ route('asesoriasa.solicitudes.get') }}" class="btn btn-sm btn-outline-primary">Ver solicitudes</a>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -89,7 +89,7 @@
                 <div class="col-md-4">
                     <div class="text-center mb-3">
                         <i class="fas fa-search fa-2x text-success mb-2"></i>
-                        <h6>Buscar Asesor</h6>
+                        <h6>Buscar Asesoria</h6>
                         <p class="small text-muted">Encuentra asesorías para tus materias</p>
                         <a href="/asesorias/solicitar" class="btn btn-sm btn-outline-success">Buscar</a>
                     </div>
@@ -99,7 +99,7 @@
                         <i class="fas fa-calendar-alt fa-2x text-success mb-2"></i>
                         <h6>Mis Asesorías</h6>
                         <p class="small text-muted">Revisa tus asesorías programadas</p>
-                        <a href="/mis-asesorias" class="btn btn-sm btn-outline-success">Ver asesorías</a>
+                        <a href="/asesorias" class="btn btn-sm btn-outline-success">Ver asesorías</a>
                     </div>
                 </div>
                 <div class="col-md-4">
