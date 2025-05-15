@@ -89,7 +89,7 @@
                 <div class="col-md-4">
                     <div class="text-center mb-3">
                         <i class="fas fa-search fa-2x text-success mb-2"></i>
-                        <h6>Buscar Asesoria</h6>
+                        <h6>Buscar Asesoría</h6>
                         <p class="small text-muted">Encuentra asesorías para tus materias</p>
                         <a href="/asesorias/solicitar" class="btn btn-sm btn-outline-success">Buscar</a>
                     </div>
@@ -97,8 +97,16 @@
                 <div class="col-md-4">
                     <div class="text-center mb-3">
                         <i class="fas fa-calendar-alt fa-2x text-success mb-2"></i>
-                        <h6>Mis Asesorías</h6>
-                        <p class="small text-muted">Revisa tus asesorías programadas</p>
+                        <h6>
+                            Mis Asesorías
+                            @php
+                                $pendientesEstudiante = Auth::user()->solicitudesPendientesEstudiante()->count();
+                            @endphp
+                            @if($pendientesEstudiante > 0)
+                                <span class="badge bg-danger rounded-pill">{{ $pendientesEstudiante }}</span>
+                            @endif
+                        </h6>
+                        <p class="small text-muted">Gestiona tus asesorías y solicitudes</p>
                         <a href="/asesorias" class="btn btn-sm btn-outline-success">Ver asesorías</a>
                     </div>
                 </div>

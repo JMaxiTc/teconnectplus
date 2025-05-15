@@ -13,7 +13,24 @@ class Calificacion extends Model
     public $incrementing=true;
     protected $keyType='int';
     protected $comentario;
-    protected $puntuacion;	
-    protected $fillable=["comentario","puntuacion"];
+    protected $puntuacion;
+    protected $id_usuario;	
+    protected $fillable=["comentario","puntuacion","id_usuario"];
     public $timestamps=false;
+    
+    /**
+     * Get the asesor (user) that owns this calificacion.
+     */
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
+    }
+    
+    /**
+     * Get the asesoria related to this calificacion.
+     */
+    public function asesoria()
+    {
+        return $this->hasOne(Asesoria::class, 'fk_id_calificacion', 'id_calificacion');
+    }
 }

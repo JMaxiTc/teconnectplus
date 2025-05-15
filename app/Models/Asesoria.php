@@ -21,7 +21,7 @@ class Asesoria extends Model
     protected $fk_id_materia;
     protected $fk_id_calificacion;
     protected $fk_id_recurso;	
-    protected $fillable=["duracion","estado","fecha","tema","fk_id_asesor","fk_id_estudiante","fk_id_materia","fk_id_calificacion","fk_id_recurso","videoconference_url","meet_code"];
+    protected $fillable=["duracion","estado","fecha","tema","fk_id_asesor","fk_id_estudiante","fk_id_materia","fk_id_calificacion","fk_id_recurso","videoconference_url","meet_code","observaciones"];
     public $timestamps=false;
 
     public function estudiante()
@@ -37,6 +37,11 @@ public function asesor()
 public function materia()
 {
     return $this->belongsTo(Materia::class, 'fk_id_materia', 'id_materia');
+}
+
+public function calificacion()
+{
+    return $this->belongsTo(Calificacion::class, 'fk_id_calificacion', 'id_calificacion');
 }
 
 }

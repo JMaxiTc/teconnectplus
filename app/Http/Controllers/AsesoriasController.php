@@ -109,10 +109,17 @@ class AsesoriasController extends Controller
 
         $request->validate([
             'estado' => 'required|in:PENDIENTE,CONFIRMADA,PROCESO,FINALIZADA,CANCELADA',
+            'observaciones' => $request->estado === 'CANCELADA' ? 'required|string|min:10' : 'nullable',
         ]);
 
         $estado_anterior = $asesoria->estado;
         $asesoria->estado = $request->estado;
+        
+        // Guardar observaciones cuando se cancela una asesoría
+        if ($request->estado === 'CANCELADA' && $request->has('observaciones')) {
+            $asesoria->observaciones = $request->observaciones;
+        }
+        
         $asesoria->save();
 
         session()->flash('tipo', 'success');
@@ -173,6 +180,20 @@ class AsesoriasController extends Controller
     {
         $count = Asesoria::where('fk_id_asesor', Auth::user()->id_usuario)
             ->where('estado', 'PENDIENTE')
+            ->count();
+
+        return response()->json(['count' => $count]);
+    }
+    
+    /**
+     * Cuenta el número de asesorías activas para el asesor autenticado
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function countActiveAsesorias()
+    {
+        $count = Asesoria::where('fk_id_asesor', Auth::user()->id_usuario)
+            ->whereIn('estado', ['CONFIRMADA', 'PROCESO'])
             ->count();
 
         return response()->json(['count' => $count]);
@@ -378,6 +399,30 @@ class AsesoriasController extends Controller
         session()->flash('mensaje', '¡Enlace de reunión guardado correctamente!');
         
         return redirect()->route('asesoriasa.detalle.get', $request->id_asesoria);
+    }
+
+    /**
+     * Cuenta las solicitudes pendientes para un estudiante
+     */
+    public function countPendingSolicitudesEstudiante()
+    {
+        $count = Asesoria::where('fk_id_estudiante', Auth::user()->id_usuario)
+            ->where('estado', 'PENDIENTE')
+            ->count();
+
+        return response()->json(['count' => $count]);
+    }
+
+    /**
+     * Cuenta las asesorías activas para un estudiante
+     */
+    public function countActiveAsesoriasEstudiante()
+    {
+        $count = Asesoria::where('fk_id_estudiante', Auth::user()->id_usuario)
+            ->whereIn('estado', ['CONFIRMADA', 'PROCESO'])
+            ->count();
+
+        return response()->json(['count' => $count]);
     }
 }
 

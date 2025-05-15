@@ -36,17 +36,32 @@
                                 <i class="fas fa-chalkboard-teacher me-1"></i>Asesorías
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="asesoriasDropdown">
-                                <li><a class="dropdown-item" href="{{ route('asesoriasa.activas.get') }}"><i class="fas fa-calendar-check me-1"></i>Asesorías Activas</a></li>
+                                <li><a class="dropdown-item" href="{{ route('asesoriasa.activas.get') }}"><i class="fas fa-calendar-check me-1"></i>Asesorías Activas <span id="menu-active-count" class="badge bg-success rounded-pill">0</span></a></li>
                                 <li><a class="dropdown-item" href="{{ route('asesoriasa.solicitudes.get') }}"><i class="fas fa-clipboard-list me-1"></i>Solicitudes <span id="menu-pending-count" class="badge bg-primary rounded-pill">0</span></a></li>
                                 <li><a class="dropdown-item" href="{{ route('asesoriasa.historial.get') }}"><i class="fas fa-history me-1"></i>Historial</a></li>
+                                <li><a class="dropdown-item" href="{{ route('asesoriasa.calificaciones') }}"><i class="fas fa-star me-1"></i>Mis Calificaciones</a></li>
                             </ul>
                         </li>
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
+                                // Cargar contador de solicitudes pendientes
                                 fetch("{{ route('asesoriasa.solicitudes.count') }}")
                                     .then(response => response.json())
                                     .then(data => {
                                         const badge = document.getElementById('menu-pending-count');
+                                        if (badge) {
+                                            badge.textContent = data.count;
+                                            if (data.count > 0) {
+                                                badge.classList.add('pulse');
+                                            }
+                                        }
+                                    });
+                                    
+                                // Cargar contador de asesorías activas
+                                fetch("{{ route('asesoriasa.activas.count') }}")
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const badge = document.getElementById('menu-active-count');
                                         if (badge) {
                                             badge.textContent = data.count;
                                             if (data.count > 0) {
@@ -66,13 +81,42 @@
                                 <i class="fas fa-chalkboard-teacher me-1"></i>Mis Asesorías
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="estudianteAsesoriasDropdown">
-                                <li><a class="dropdown-item" href="{{ route('asesorias.index') }}"><i class="fas fa-calendar-check me-1"></i>Asesorías Activas</a></li>
-                                <li><a class="dropdown-item" href="{{ route('asesorias.pendientes.get') }}"><i class="fas fa-hourglass-half me-1"></i>Pendientes</a></li>
+                                <li><a class="dropdown-item" href="{{ route('asesorias.index') }}"><i class="fas fa-calendar-check me-1"></i>Asesorías Activas <span id="menu-estudiante-active-count" class="badge bg-success rounded-pill">0</span></a></li>
+                                <li><a class="dropdown-item" href="{{ route('asesorias.pendientes.get') }}"><i class="fas fa-hourglass-half me-1"></i>Pendientes <span id="menu-estudiante-pending-count" class="badge bg-primary rounded-pill">0</span></a></li>
                                 <li><a class="dropdown-item" href="{{ route('asesorias.historial.get') }}"><i class="fas fa-history me-1"></i>Historial</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{{ route('asesorias.solicitar.get') }}"><i class="fas fa-plus me-1"></i>Solicitar Asesoría</a></li>
                             </ul>
                         </li>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Cargar contador de solicitudes pendientes para estudiantes
+                                fetch("{{ route('asesorias.pendientes.count') }}")
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const badge = document.getElementById('menu-estudiante-pending-count');
+                                        if (badge) {
+                                            badge.textContent = data.count;
+                                            if (data.count > 0) {
+                                                badge.classList.add('pulse');
+                                            }
+                                        }
+                                    });
+                                    
+                                // Cargar contador de asesorías activas para estudiantes
+                                fetch("{{ route('asesorias.activas.count') }}")
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const badge = document.getElementById('menu-estudiante-active-count');
+                                        if (badge) {
+                                            badge.textContent = data.count;
+                                            if (data.count > 0) {
+                                                badge.classList.add('pulse');
+                                            }
+                                        }
+                                    });
+                            });
+                        </script>
                     @endif
                     
                     <li class="nav-item dropdown">

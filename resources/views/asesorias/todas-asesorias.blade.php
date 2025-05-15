@@ -84,6 +84,12 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        @if($asesoria->estado === 'CANCELADA' && $asesoria->observaciones)
+                                        <div class="alert alert-danger mt-3 mb-0">
+                                            <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Motivo de cancelación:</h6>
+                                            <p class="mb-0">{{ $asesoria->observaciones }}</p>
+                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

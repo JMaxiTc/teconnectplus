@@ -3,6 +3,8 @@
 @section('content')
 @component("components.breadcrumbs", ["breadcrumbs" => $breadcrumbs])
 @endcomponent
+
+<!-- Encabezado de la página -->
 <div class="header-container">
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center">
@@ -106,13 +108,9 @@
                                                     <i class="fas fa-check-circle me-2"></i> Aceptar
                                                 </button>
                                             </form>
-                                            <form action="{{ route('asesoriasa.actualizar', $asesoria->id_asesoria) }}" method="POST" class="w-100">
-                                                @csrf
-                                                <input type="hidden" name="estado" value="CANCELADA">
-                                                <button type="submit" class="btn btn-action btn-reject w-100">
-                                                    <i class="fas fa-times-circle me-2"></i> Rechazar
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-action btn-reject w-100" data-bs-toggle="modal" data-bs-target="#cancelarAsesoria{{ $asesoria->id_asesoria }}Modal">
+                                                <i class="fas fa-times-circle me-2"></i> Rechazar
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -136,5 +134,48 @@
         </div>
     </div>
 </div>
+
+<!-- Modales de Cancelación/Rechazo de Asesorías -->
+@foreach($asesorias as $asesoria)
+    @if($asesoria->estado === 'PENDIENTE')
+    <div class="modal fade" id="cancelarAsesoria{{ $asesoria->id_asesoria }}Modal" tabindex="-1" aria-labelledby="cancelarAsesoria{{ $asesoria->id_asesoria }}ModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="cancelarAsesoria{{ $asesoria->id_asesoria }}ModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Rechazar Solicitud de Asesoría
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('asesoriasa.actualizar', $asesoria->id_asesoria) }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Por favor, proporciona el motivo del rechazo. Esta información será visible para el estudiante.
+                        </div>
+                        
+                        <input type="hidden" name="estado" value="CANCELADA">
+                        
+                        <div class="mb-3">
+                            <label for="observaciones{{ $asesoria->id_asesoria }}" class="form-label">Motivo del rechazo <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="observaciones{{ $asesoria->id_asesoria }}" name="observaciones" rows="4" required></textarea>
+                            <div class="form-text">Por favor, sé claro y específico sobre por qué no puedes atender esta solicitud.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-times-circle me-2"></i>
+                            Confirmar Rechazo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+@endforeach
 
 @endsection

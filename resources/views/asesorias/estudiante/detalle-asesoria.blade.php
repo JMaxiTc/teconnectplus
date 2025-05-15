@@ -230,9 +230,7 @@
                         <p class="mb-0">Te notificaremos cuando el asesor confirme o rechace tu solicitud.</p>
                     </div>
                 </div>
-            @endif
-
-            @if($asesoria->estado === 'CANCELADA')
+            @endif            @if($asesoria->estado === 'CANCELADA')
                 <div class="card shadow-sm border-0 rounded-lg mb-4">
                     <div class="card-header bg-white py-3 border-bottom">
                         <h3 class="text-xl font-semibold text-gray-800 mb-0">
@@ -242,8 +240,16 @@
                     </div>
                     <div class="card-body p-4">
                         <div class="alert alert-danger">
-                            <p><i class="fas fa-info-circle me-2"></i> Esta asesoría ha sido cancelada.</p>
+                            <p><i class="fas fa-info-circle me-2"></i> Esta asesoría ha sido cancelada por el asesor.</p>
                         </div>
+                        
+                        @if($asesoria->observaciones)
+                        <div class="border rounded p-3 mb-3 bg-light">
+                            <h5 class="fw-bold mb-2">Motivo de la cancelación:</h5>
+                            <p class="mb-0">{{ $asesoria->observaciones }}</p>
+                        </div>
+                        @endif
+                        
                         <p class="mb-0">Si necesitas ayuda, puedes solicitar una nueva asesoría.</p>
                         <div class="d-grid mt-3">
                             <a href="{{ route('asesorias.solicitar.get') }}" class="btn btn-primary">
@@ -252,9 +258,7 @@
                         </div>
                     </div>
                 </div>
-            @endif
-
-            @if($asesoria->estado === 'FINALIZADA')
+            @endif            @if($asesoria->estado === 'FINALIZADA')
                 <div class="card shadow-sm border-0 rounded-lg mb-4">
                     <div class="card-header bg-white py-3 border-bottom">
                         <h3 class="text-xl font-semibold text-gray-800 mb-0">
@@ -266,6 +270,22 @@
                         <div class="alert alert-success">
                             <p><i class="fas fa-info-circle me-2"></i> Esta asesoría ha sido completada exitosamente.</p>
                         </div>
+                        
+                        @if(empty($asesoria->fk_id_calificacion))
+                            <div class="alert alert-info mb-3">
+                                <p><i class="fas fa-star me-2"></i> ¿Cómo calificarías a tu asesor?</p>
+                            </div>
+                            <div class="d-grid mb-3">
+                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#calificarModal">
+                                    <i class="fas fa-star me-2"></i> Calificar a mi asesor
+                                </button>
+                            </div>
+                        @else
+                            <div class="alert alert-info mb-3">
+                                <p><i class="fas fa-check-circle me-2"></i> ¡Gracias por calificar a tu asesor!</p>
+                            </div>
+                        @endif
+                        
                         <p class="mb-3">¿Necesitas otra sesión? Puedes solicitar una nueva asesoría.</p>
                         <div class="d-grid">
                             <a href="{{ route('asesorias.solicitar.get') }}" class="btn btn-primary">
@@ -275,7 +295,56 @@
                     </div>
                 </div>
             @endif
+        </div>    </div>
+</div>
+
+<!-- Modal para calificar al asesor -->
+@if($asesoria->estado === 'FINALIZADA' && empty($asesoria->fk_id_calificacion))
+<div class="modal fade" id="calificarModal" tabindex="-1" aria-labelledby="calificarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="calificarModalLabel">
+                    <i class="fas fa-star me-2"></i>
+                    Calificar a tu asesor
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('calificaciones.guardar') }}" method="POST">
+                @csrf
+                <input type="hidden" name="id_asesoria" value="{{ $asesoria->id_asesoria }}">
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <h6 class="mb-3">¿Cómo calificarías a {{ $asesoria->asesor->nombre }} {{ $asesoria->asesor->apellido }}?</h6>
+                        
+                        <div class="rating-stars mb-4">
+                            <div class="btn-group" role="group">
+                                @for($i = 1; $i <= 5; $i++)
+                                <input type="radio" class="btn-check" name="puntuacion" id="star{{ $i }}" value="{{ $i }}" {{ $i == 5 ? 'checked' : '' }}>
+                                <label class="btn btn-outline-warning" for="star{{ $i }}">
+                                    <i class="fas fa-star"></i> {{ $i }}
+                                </label>
+                                @endfor
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="comentario" class="form-label">Comentario (opcional):</label>
+                            <textarea class="form-control" id="comentario" name="comentario" rows="3" placeholder="Escribe un comentario sobre tu experiencia..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        Enviar calificación
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+@endif
+
 @endsection

@@ -13,7 +13,7 @@ class Usuario extends Authenticatable
     protected $primaryKey='id_usuario';
     public $incrementing=false; // Cambiar a false para indicar que el ID no es autoincremental
     protected $keyType='int';
-    protected $fillable=["id_usuario", "nombre","apellido", "carrera", "correo", "fechaNacimiento", "id_genero", "rol", "semestre", "password"]; // Añadir id_usuario
+    protected $fillable=["id_usuario", "nombre","apellido", "carrera","correo", "fechaNacimiento", "id_genero", "rol", "semestre", "password"]; // Se eliminó id_calificacion
     public $timestamps=false;
     
     /**
@@ -62,11 +62,21 @@ class Usuario extends Authenticatable
     {
         return $this->belongsTo(Genero::class, 'id_genero', 'id_genero');
     }
+    
+    /**
+     * Get all the calificaciones for this user (when is an asesor).
+     */
+    public function calificaciones()
+    {
+        return $this->hasMany(Calificacion::class, 'id_usuario', 'id_usuario');
+    }
 
     public function materias()
-{
-    return $this->belongsToMany(Materia::class, 'asesor_materia', 'fk_id_asesor', 'fk_id_materia');
-}
+    {
+        return $this->belongsToMany(Materia::class, 'asesor_materia', 'fk_id_asesor', 'fk_id_materia');
+    }
+
+    
 
 /**
  * Get pending asesorias for this user (when is an asesor)
@@ -74,7 +84,16 @@ class Usuario extends Authenticatable
 public function solicitudesPendientes()
 {
     return $this->hasMany(Asesoria::class, 'fk_id_asesor', 'id_usuario')
-        ->where('estado', 'pendiente');
+        ->where('estado', 'PENDIENTE');
+}
+
+/**
+ * Get pending asesorias for this user (when is a student)
+ */
+public function solicitudesPendientesEstudiante()
+{
+    return $this->hasMany(Asesoria::class, 'fk_id_estudiante', 'id_usuario')
+        ->where('estado', 'PENDIENTE');
 }
 
 /**

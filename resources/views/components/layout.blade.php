@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ URL::asset('bootstrap-5.3.5-dist/css/bootstrap.min.css') }}" />
     <link href="{{ URL::asset('DataTables/datatables.min.css') }}" rel="stylesheet" />
     <link href="{{ URL::asset('assets/style.css') }}" rel="stylesheet" />
+    <link href="{{ URL::asset('assets/calificaciones.css') }}" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body class="

@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AsesoriasController;
 use App\Http\Controllers\AsesorMateriaController;
 use App\Http\Controllers\VideollamadaController;
+use App\Http\Controllers\CalificacionesController;
 
 Route::get('/', function(){
     return app(CatalogosController::class)->index();
@@ -28,6 +29,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     // Ruta para cerrar sesión
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    // Ruta para guardar calificaciones
+    Route::post('/calificaciones/guardar', [CalificacionesController::class, 'guardarCalificacion'])->name('calificaciones.guardar');
 
     Route::get('/catalogos/materias', [CatalogosController::class, 'materiasGet']);
     Route::get('/catalogos/materias/agregar', [CatalogosController::class, 'materiasAgregarGet']);
@@ -53,15 +57,6 @@ Route::middleware('auth','can:ADMIN')->group(function () {
     Route::post('/admin/usuarios/{id_usuario}/actualizar', [AdminController::class, 'usuariosActualizarPost']);
 });
 
-//Asesor mis materias
-Route::middleware('auth', 'can:ASESOR')->group(function () {
-    Route::get('asesor/mis-materias', [AsesorMateriaController::class, 'misMateriasGet'])->name('misMateriasGet');
-    Route::post('asesor/asignar-materia', [AsesorMateriaController::class, 'asignarMateriaPost'])->name('asignarMateriaPost');
-    Route::delete('asesor/eliminar-materia/{id}', [AsesorMateriaController::class, 'eliminarMateriaPost'])->name('eliminarMateriaPost');
-});
-
-
-
 // Estudiante
 Route::middleware(['auth', 'can:ESTUDIANTE'])->group(function () {
     // Solicitar asesoría
@@ -74,6 +69,8 @@ Route::middleware(['auth', 'can:ESTUDIANTE'])->group(function () {
     
     // Solicitudes pendientes (PENDIENTE)
     Route::get('/asesorias/pendientes', [AsesoriasController::class, 'estudianteSolicitudesPendientesGet'])->name('asesorias.pendientes.get');
+    Route::get('/asesorias/pendientes/count', [AsesoriasController::class, 'countPendingSolicitudesEstudiante'])->name('asesorias.pendientes.count');
+    Route::get('/asesorias/activas/count', [AsesoriasController::class, 'countActiveAsesoriasEstudiante'])->name('asesorias.activas.count');
     
     // Historial (CANCELADA, FINALIZADA)
     Route::get('/asesorias/historial', [AsesoriasController::class, 'estudianteHistorialGet'])->name('asesorias.historial.get');
@@ -84,15 +81,25 @@ Route::middleware(['auth', 'can:ESTUDIANTE'])->group(function () {
 
 // Asesor
 Route::middleware(['auth', 'can:ASESOR'])->group(function () {
+
+    // Asignar materias
+    Route::get('asesor/mis-materias', [AsesorMateriaController::class, 'misMateriasGet'])->name('misMateriasGet');
+    Route::post('asesor/asignar-materia', [AsesorMateriaController::class, 'asignarMateriaPost'])->name('asignarMateriaPost');
+    Route::delete('asesor/eliminar-materia/{id}', [AsesorMateriaController::class, 'eliminarMateriaPost'])->name('eliminarMateriaPost');
+
     // Asesorías Activas (CONFIRMADA, PROCESO) - Página principal
     Route::get('/asesoriasa/activas', [AsesoriasController::class, 'asesoriasActivasGet'])->name('asesoriasa.activas.get');
     
     // Solicitudes (PENDIENTE)
     Route::get('/asesoriasa/solicitudes', [AsesoriasController::class, 'solicitudesPendientesGet'])->name('asesoriasa.solicitudes.get');
     Route::get('/asesoriasa/solicitudes/count', [AsesoriasController::class, 'countPendingSolicitudes'])->name('asesoriasa.solicitudes.count');
+    Route::get('/asesoriasa/activas/count', [AsesoriasController::class, 'countActiveAsesorias'])->name('asesoriasa.activas.count');
     
     // Historial (CANCELADA, FINALIZADA)
     Route::get('/asesoriasa/historial', [AsesoriasController::class, 'todasAsesoriasGet'])->name('asesoriasa.historial.get');
+    
+    // Mis calificaciones
+    Route::get('/mis-calificaciones', [CalificacionesController::class, 'misCalificaciones'])->name('asesoriasa.calificaciones');
     
     // Detalle de asesoría
     Route::get('/asesoriasa/detalle/{id}', [AsesoriasController::class, 'detalleAsesoriaGet'])->name('asesoriasa.detalle.get');

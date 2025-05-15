@@ -214,9 +214,10 @@ Estilos para asesorias
 }
 
 .badge.bg-primary,
-.badge.bg-success {
-        animation: pulse 2s infinite;
-    }
+.badge.bg-success,
+.badge.pulse {
+    animation: pulse 2s infinite;
+}
 
 .card-materia {
         border: none;
@@ -284,7 +285,7 @@ Estilos para asesorias
     }
 
     /* Estilos para tarjetas de solicitud */    
-    .solicitud-card {
+.solicitud-card {
         position: relative;
         border: none;
         border-radius: 16px;
@@ -452,4 +453,261 @@ Estilos para asesorias
         height: 30px;
         background: transparent;
         z-index: 1;
+    }
+
+/* 
+* ESTILOS PARA EL SISTEMA DE CALIFICACIONES 
+*/
+    .rating-overview {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 40px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        background-image: linear-gradient(135deg, #f8f9fa 25%, #ffffff 25%, #ffffff 50%, #f8f9fa 50%, #f8f9fa 75%, #ffffff 75%, #ffffff 100%);
+        background-size: 20px 20px;
+        border: 1px solid rgba(0,123,255,0.2);
+    }
+    
+    .rating-overview h2 {
+        margin-bottom: 20px;
+        color: #333;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 10px;
+    }
+    
+    .rating-overview h2:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: #007bff;
+        border-radius: 3px;
+    }
+    
+    .average-rating {
+        font-size: 3.5rem;
+        font-weight: bold;
+        color: #007bff;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 10px;
+    }
+    
+    .star-display {
+        font-size: 1.4rem;
+        color: #FFD700;
+        margin: 5px 0;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .rating-card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        border-left: 5px solid #007bff;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Colores del borde según la puntuación */
+    .rating-card[data-rating="5"] {
+        border-left-color: #28a745;
+    }
+    
+    .rating-card[data-rating="4"] {
+        border-left-color: #5cb85c;
+    }
+    
+    .rating-card[data-rating="3"] {
+        border-left-color: #ffc107;
+    }
+    
+    .rating-card[data-rating="2"] {
+        border-left-color: #fd7e14;
+    }
+    
+    .rating-card[data-rating="1"] {
+        border-left-color: #dc3545;
+    }
+    
+    .rating-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .rating-card:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 40px 40px 0;
+        border-color: transparent #f8f9fa transparent transparent;
+    }
+    
+    .rating-date {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+        background-color: #f8f9fa;
+        padding: 3px 8px;
+        border-radius: 10px;
+        margin-left: 10px;
+    }
+    
+    .rating-comment {
+        margin-top: 10px;
+        font-style: italic;
+        color: #555;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 6px;
+        position: relative;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+    
+    .rating-comment:before {
+        content: '"';
+        font-size: 3rem;
+        color: rgba(0,123,255,0.1);
+        position: absolute;
+        top: -10px;
+        left: 5px;
+        font-family: Georgia, serif;
+    }
+    
+    .rating-progress {
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .rating-progress .progress-bar {
+        background-image: linear-gradient(to right, #007bff, #0056b3);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    /* Colores para las barras de progreso según la puntuación */
+    .bg-rating-5 {
+        background-image: linear-gradient(to right, #28a745, #218838) !important;
+    }
+    
+    .bg-rating-4 {
+        background-image: linear-gradient(to right, #5cb85c, #449d44) !important;
+    }
+    
+    .bg-rating-3 {
+        background-image: linear-gradient(to right, #ffc107, #d39e00) !important;
+    }
+    
+    .bg-rating-2 {
+        background-image: linear-gradient(to right, #fd7e14, #e36209) !important;
+    }
+    
+    .bg-rating-1 {
+        background-image: linear-gradient(to right, #dc3545, #bd2130) !important;
+    }
+    
+    .star-count {
+        font-weight: 600;
+        color: #555;
+        font-size: 1.1rem;
+    }
+    
+    .no-ratings {
+        text-align: center;
+        padding: 40px;
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        color: #6c757d;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .no-ratings i {
+        font-size: 5rem;
+        color: #d1d1d1;
+        margin-bottom: 20px;
+    }
+    
+    .no-ratings h3 {
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    /* Estilos para la paginación */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .pagination .page-item .page-link {
+        color: #007bff;
+        border-radius: 50%;
+        margin: 0 5px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: 1px solid #dee2e6;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+        box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+    }
+    
+    .pagination .page-item .page-link:hover {
+        background-color: #e9ecef;
+        color: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        cursor: not-allowed;
+    }
+    
+    /* Mostrar número total de calificaciones */
+    .pagination-info {
+        text-align: center;
+        margin-top: 10px;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .page-title {
+        position: relative;
+        display: inline-block;
+        font-weight: 600;
+        margin-bottom: 30px;
+        color: #333;
+    }
+    
+    .page-title:after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 50%;
+        height: 4px;
+        background-image: linear-gradient(to right, #007bff, transparent);
+        border-radius: 2px;
     }

@@ -126,11 +126,10 @@
                                         Finalizar
                                     </button>
                                 </form>
-                                
-                                <form action="{{ route('asesoriasa.actualizar', $asesoria->id_asesoria) }}" method="POST" class="flex-grow-1">
+                                  <form action="{{ route('asesoriasa.actualizar', $asesoria->id_asesoria) }}" method="POST" class="flex-grow-1">
                                     @csrf
                                     <input type="hidden" name="estado" value="CANCELADA">
-                                    <button type="submit" class="btn btn-danger w-100">
+                                    <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelarAsesoriaModal">
                                         <i class="fas fa-times-circle me-2"></i>
                                         Cancelar
                                     </button>
@@ -140,7 +139,7 @@
                             <form action="{{ route('asesoriasa.actualizar', $asesoria->id_asesoria) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="estado" value="CANCELADA">
-                                <button type="submit" class="btn btn-danger w-100">
+                                <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelarAsesoriaModal">
                                     <i class="fas fa-times-circle me-2"></i>
                                     Cancelar Asesoría
                                 </button>
@@ -149,6 +148,22 @@
                     </div>
                 </div>
             </div>
+
+            @if($asesoria->estado === 'CANCELADA' && $asesoria->observaciones)
+            <div class="card shadow-sm border-0 rounded-lg mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0 fs-5">
+                        <i class="fas fa-ban me-2"></i>
+                        Motivo de la Cancelación
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="border rounded p-3 bg-light">
+                        <p class="mb-0">{{ $asesoria->observaciones }}</p>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
         
         <!-- Columna de información del estudiante y herramientas -->
@@ -274,7 +289,45 @@
                         </div>
                     </div>
                 </div>
+            </div>        </div>
+    </div>
+</div>
+
+<!-- Modal de Cancelación de Asesoría -->
+<div class="modal fade" id="cancelarAsesoriaModal" tabindex="-1" aria-labelledby="cancelarAsesoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelarAsesoriaModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Cancelar Asesoría
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <form action="{{ route('asesoriasa.actualizar', $asesoria->id_asesoria) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Por favor, proporciona el motivo de la cancelación. Esta información será visible para el estudiante.
+                    </div>
+                    
+                    <input type="hidden" name="estado" value="CANCELADA">
+                    
+                    <div class="mb-3">
+                        <label for="observaciones" class="form-label">Motivo de la cancelación <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="4" required></textarea>
+                        <div class="form-text">Por favor, sé claro y específico.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times-circle me-2"></i>
+                        Confirmar Cancelación
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
