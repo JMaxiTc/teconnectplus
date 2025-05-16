@@ -1,0 +1,24 @@
+.col {
+    margin-bottom: 20px;
+}
+
+.col .info-item1 {
+    height: 100%; /* Asegura que todas las tarjetas tengan la misma altura */
+}
+
+.info-content {
+    flex-grow: 1; /* Permite que el contenido ocupe todo el espacio disponible */
+}
+
+/* Mejora la visualización en móviles */
+@media (max-width: 767px) {
+    .campo-vista {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .campo-vista button {
+        margin-left: 0 !important;
+        margin-top: 8px;
+    }
+}

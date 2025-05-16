@@ -89,7 +89,7 @@ class CalificacionesController extends Controller
           // Crear la calificación
         $calificacion = new Calificacion();
         $calificacion->puntuacion = $request->puntuacion;
-        $calificacion->comentario = $request->comentario;
+        $calificacion->comentario = $request->comentario ?? ''; // Set empty string if comentario is null
         $calificacion->id_usuario = $asesoria->fk_id_asesor; // Asociar la calificación con el asesor
         $calificacion->save();
         

@@ -1,0 +1,56 @@
+/* Estilos para la página de perfil */
+.info-item1 {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.info-item1:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+    border-color: rgba(0,0,0,0.15) !important;
+}
+
+.info-icon {
+    font-size: 1.5rem;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(25, 135, 84, 0.1);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.semester-circle {
+    transition: all 0.3s ease;
+}
+
+.editar-campo {
+    transition: all 0.2s;
+    opacity: 0.6;
+}
+
+.editar-campo:hover {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+/* Forzar dos columnas en cualquier pantalla de tablet o mayor */
+@media (min-width: 768px) {
+    .row-cols-md-2 > .col {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 767px) {
+    .row-cols-1 > .col {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 10px;
+    }
+}

@@ -45,6 +45,11 @@ Route::middleware('auth')->group(function () {
     Route::get('perfil', [UserController::class, 'perfil'])->name('perfil.show');
     Route::post('perfil/{id_usuario}/actualizar', [UserController::class, 'actualizar'])->name('perfil.update');
     
+    // Ruta para refrescar el token CSRF
+    Route::get('/csrf-token', function () {
+        return response()->json(['token' => csrf_token()]);
+    });
+    
 
     // Aquí puedes añadir otras rutas que requieran autenticación
     // como las rutas para asesorías y materiales

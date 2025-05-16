@@ -37,68 +37,82 @@
     <div class="row">
         <!-- Columna de información de la asesoría -->
         <div class="col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-lg mb-4">
-                <div class="card-header bg-primary text-white">
+            <div class="card solicitud-card mb-4">
+                <div class="card-header text-white">
                     <h3 class="mb-0 fs-5">
                         <i class="fas fa-info-circle me-2"></i>
                         Información de la Asesoría
                     </h3>
                 </div>
-                <div class="card-body">
-                    <div class="info-block mb-4">
-                        <h4 class="text-primary">
-                            <i class="fas fa-book me-2"></i>
-                            Materia
-                        </h4>
-                        <p class="fs-5 fw-semibold">{{ $asesoria->materia->nombre }}</p>
-                    </div>
-                    
-                    <div class="info-block mb-4">
-                        <h4 class="text-primary">
-                            <i class="fas fa-clipboard me-2"></i>
-                            Tema
-                        </h4>
-                        <p class="fs-5 fw-semibold">{{ $asesoria->tema }}</p>
-                    </div>
-                    
-                    <div class="info-block mb-4">
-                        <h4 class="text-primary">
-                            <i class="fas fa-calendar-alt me-2"></i>
-                            Fecha y hora
-                        </h4>
-                        <p class="fs-5 fw-semibold">{{ date('d/m/Y', strtotime($asesoria->fecha)) }} 
-                           <span class="badge bg-info ms-2">
-                               <i class="fas fa-clock me-1"></i> 
-                               {{ date('H:i', strtotime($asesoria->fecha)) }}
-                           </span>
-                        </p>
-                    </div>
-                    
-                    <div class="info-block mb-4">
-                        <h4 class="text-primary">
-                            <i class="fas fa-hourglass-half me-2"></i>
-                            Duración
-                        </h4>
-                        <p class="fs-5 fw-semibold">{{ $asesoria->duracion }}</p>
-                    </div>
-                    
-                    <div class="info-block">
-                        <h4 class="text-primary">
-                            <i class="fas fa-tag me-2"></i>
-                            Estado
-                        </h4>
-                        @if($asesoria->estado === 'CONFIRMADA')
-                            <span class="badge bg-success fs-6 px-3 py-2">Confirmada</span>
-                        @elseif($asesoria->estado === 'PROCESO')
-                            <span class="badge bg-info fs-6 px-3 py-2">En Proceso</span>
-                        @endif
+                <div class="card-body p-4">
+                    <div class="info-section">
+                        <div class="info-item1">
+                            <div class="info-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Materia</span>
+                                <p class="info-text">{{ $asesoria->materia->nombre }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item1">
+                            <div class="info-icon">
+                                <i class="fas fa-clipboard"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Tema</span>
+                                <p class="info-text">{{ $asesoria->tema }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item1">
+                            <div class="info-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Fecha y hora</span>
+                                <p class="info-text">{{ date('d/m/Y', strtotime($asesoria->fecha)) }} 
+                                    <span class="badge bg-info ms-2">
+                                        <i class="fas fa-clock me-1"></i> 
+                                        {{ date('H:i', strtotime($asesoria->fecha)) }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item1">
+                            <div class="info-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Duración</span>
+                                <p class="info-text">{{ $asesoria->duracion }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item1">
+                            <div class="info-icon">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">Estado</span>
+                                <div class="info-text">
+                                    @if($asesoria->estado === 'CONFIRMADA')
+                                        <span class="badge bg-success fs-6 px-3 py-2">Confirmada</span>
+                                    @elseif($asesoria->estado === 'PROCESO')
+                                        <span class="badge bg-info fs-6 px-3 py-2">En Proceso</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <!-- Acciones para la asesoría -->
-            <div class="card shadow-sm border-0 rounded-lg">
-                <div class="card-header bg-secondary text-white">
+            <div class="card solicitud-card">
+                <div class="card-header text-white">
                     <h3 class="mb-0 fs-5">
                         <i class="fas fa-cogs me-2"></i>
                         Acciones
@@ -150,16 +164,21 @@
             </div>
 
             @if($asesoria->estado === 'CANCELADA' && $asesoria->observaciones)
-            <div class="card shadow-sm border-0 rounded-lg mb-4">
-                <div class="card-header bg-danger text-white">
+            <div class="card solicitud-card mt-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #dc3545, #c82333);">
                     <h3 class="mb-0 fs-5">
                         <i class="fas fa-ban me-2"></i>
                         Motivo de la Cancelación
                     </h3>
                 </div>
                 <div class="card-body p-4">
-                    <div class="border rounded p-3 bg-light">
-                        <p class="mb-0">{{ $asesoria->observaciones }}</p>
+                    <div class="info-item1">
+                        <div class="info-icon" style="background-color: rgba(220, 53, 69, 0.1);">
+                            <i class="fas fa-exclamation-circle" style="color: #dc3545;"></i>
+                        </div>
+                        <div class="info-content">
+                            <p class="info-text">{{ $asesoria->observaciones }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -168,42 +187,66 @@
         
         <!-- Columna de información del estudiante y herramientas -->
         <div class="col-lg-8">
-            <div class="card shadow-sm border-0 rounded-lg mb-4">
-                <div class="card-header bg-info text-white">
+            <div class="card solicitud-card mb-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #17a2b8, #138496);">
                     <h3 class="mb-0 fs-5">
                         <i class="fas fa-user-graduate me-2"></i>
                         Información del Estudiante
                     </h3>
                 </div>
-                <div class="card-body">
-                    <div class="row">                        <div class="col-md-6 mb-4">
-                            <h4 class="text-info">
-                                <i class="fas fa-user me-2"></i>
-                                Nombre
-                            </h4>
-                            <p class="fs-5 fw-semibold">{{ $asesoria->estudiante->nombre }} {{ $asesoria->estudiante->apellido }}</p>
-                        </div>
-                          <div class="col-md-6 mb-4">
-                            <h4 class="text-info text-center">
-                                <i class="fas fa-graduation-cap me-2" ></i>
-                                Carrera
-                            </h4>
-                            <p class="fs-5 fw-semibold text-center">{{ $asesoria->estudiante->carrera}}</p>
-                        </div>
-                        
-                        <div class="col-md-6 mb-4">
-                            <h4 class="text-info">
-                                <i class="fas fa-envelope me-2"></i>
-                                Correo Electrónico
-                            </h4>
-                            <p class="fs-5 fw-semibold">{{ $asesoria->estudiante->correo }}</p>                        </div><div class="col-md-6 mb-4">
-                            <h4 class="text-info text-center">
-                                <i class="fas fa-book-reader me-2"></i>
-                                Semestre
-                            </h4>
-                            <div class="d-flex justify-content-center mt-2">
-                                <div class="semester-circle d-flex align-items-center justify-content-center bg-secondary text-white rounded-circle" style="width: 45px; height: 45px; font-weight: bold; font-size: 1.25rem; background-color: #6c757d !important;">
-                                    {{ $asesoria->estudiante->semestre }}
+                <div class="card-body p-4">
+                    <div class="info-section">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="info-item1">
+                                    <div class="info-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label">Nombre</span>
+                                        <p class="info-text">{{ $asesoria->estudiante->nombre }} {{ $asesoria->estudiante->apellido }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="info-item1">
+                                    <div class="info-icon">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label">Carrera</span>
+                                        <p class="info-text">{{ $asesoria->estudiante->carrera }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="info-item1">
+                                    <div class="info-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label">Correo Electrónico</span>
+                                        <p class="info-text">{{ $asesoria->estudiante->correo }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="info-item1">
+                                    <div class="info-icon">
+                                        <i class="fas fa-book-reader"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label">Semestre</span>
+                                        <div class="d-flex mt-1">
+                                            <div class="semester-circle d-flex align-items-center justify-content-center text-white rounded-circle" 
+                                                 style="width: 45px; height: 45px; font-weight: bold; font-size: 1.25rem; background-color: #17a2b8 !important;">
+                                                {{ $asesoria->estudiante->semestre }}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -212,21 +255,23 @@
             </div>
             
             <!-- Herramientas para la sesión -->
-            <div class="card shadow-sm border-0 rounded-lg">
-                <div class="card-header bg-success text-white">
+            <div class="card solicitud-card">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #28a745, #218838);">
                     <h3 class="mb-0 fs-5">
                         <i class="fas fa-tools me-2"></i>
                         Herramientas para la Sesión
                     </h3>
-                </div><div class="card-body">
+                </div><div class="card-body p-4">
                     <div class="row g-4">
-                        <div class="col-md-6">                            <div class="tool-card h-100 p-4 border rounded shadow-sm text-center">                                <div class="tool-icon mb-3">
-                                    <i class="fas fa-video fa-3x text-primary"></i>
+                        <div class="col-md-6">
+                            <div class="tool-card h-100 p-4 border rounded shadow-sm text-center" style="transition: all 0.3s ease;">
+                                <div class="info-icon mx-auto mb-3" style="width: 70px; height: 70px; background-color: rgba(13, 110, 253, 0.1);">
+                                    <i class="fas fa-video fa-2x" style="color: #0d6efd;"></i>
                                 </div>
-                                <h4 class="tool-title">Video Conferencia</h4>
+                                <h4 class="tool-title mb-3">Video Conferencia</h4>
                                 <div class="mb-3">
                                     @if(!empty($asesoria->videoconference_url) && strpos($asesoria->videoconference_url, 'meet.google.com/') !== false && strpos($asesoria->videoconference_url, 'new') === false)
-                                        <span class="badge bg-success p-2">Reunión creada</span>
+                                        <span class="badge bg-success p-2 pulse">Reunión creada</span>
                                     @else
                                         <span class="badge bg-warning p-2">Reunión no creada</span>
                                     @endif

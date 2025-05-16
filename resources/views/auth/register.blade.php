@@ -89,6 +89,17 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="carrera" class="form-label">Carrera</label>
+                            <input id="carrera" type="text" class="form-control @error('carrera') is-invalid @enderror" name="carrera" value="{{ old('carrera') }}" required>
+                            <small class="form-text text-muted">Ejemplo: Ingeniería en Sistemas, Licenciatura en Derecho</small>
+                            @error('carrera')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label for="rol" class="form-label">Rol</label>
                             <select id="rol" class="form-select @error('rol') is-invalid @enderror" name="rol" required>
                                 <option value="">Seleccionar rol</option>
