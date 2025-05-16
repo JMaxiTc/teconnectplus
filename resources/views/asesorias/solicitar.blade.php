@@ -29,7 +29,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-lg-8 mx-auto">
+        <div class="col-lg-10 mx-auto">
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show mb-4 shadow-sm">
                     <div class="d-flex align-items-center">
@@ -879,5 +879,252 @@ document.getElementById('formAsesoria').addEventListener('submit', function(even
         });
     }
 });
+
+// Mostrar modal de confirmación en lugar de envío directo
+document.getElementById('formAsesoria').addEventListener('submit', function(event) {
+    // Prevenir envío automático para mostrar el modal primero
+    event.preventDefault();
+    
+    // Validar formulario antes de mostrar modal
+    const fecha = document.getElementById('fechaInput').value;
+    const hora = document.getElementById('horaInput').value;
+    const asesor = document.getElementById('asesorSelect').value;
+    const materiaId = document.getElementById('materiaSelect').value;
+    const tema = document.querySelector('textarea[name="tema"]').value;
+    
+    let mensajeError = '';
+    
+    if (!materiaId) {
+        mensajeError += '- Seleccione una materia<br>';
+    }
+    
+    if (!asesor) {
+        mensajeError += '- Seleccione un asesor<br>';
+    }
+    
+    if (!tema || tema.trim() === '') {
+        mensajeError += '- Indique el tema de la asesoría<br>';
+    }
+    
+    if (!fecha) {
+        mensajeError += '- Seleccione una fecha para la asesoría<br>';
+    }
+    
+    if (!hora) {
+        mensajeError += '- Seleccione un horario para la asesoría<br>';
+    }
+    
+    if (mensajeError) {
+        Swal.fire({
+            title: '¡Campos requeridos!',
+            html: '<div class="text-start">' + mensajeError + '</div>',
+            icon: 'warning',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#1a73e8'
+        });
+        return;
+    }
+    
+    // Si pasa la validación, mostrar modal de confirmación
+    const materiaText = document.getElementById('materiaSelect').options[document.getElementById('materiaSelect').selectedIndex].text;
+    const asesorText = document.getElementById('asesorSelect').options[document.getElementById('asesorSelect').selectedIndex].text;
+    const fechaTexto = document.getElementById('fechaSeleccionada').innerText;
+    const horaTexto = document.getElementById('horaSeleccionada').innerText;
+    const duracion = document.getElementById('duracionInput').value === '60' ? '1 hora' : '2 horas';
+    
+    // Usar SweetAlert2 para mostrar la confirmación
+    Swal.fire({
+        title: '<i class="fas fa-clipboard-check text-primary"></i> Confirmar Solicitud',
+        width: 500,
+        html: `
+            <div class="modal-confirmation">
+                <div class="confirmation-header mb-3 text-center">
+                    <div class="mb-2">
+                        <div class="icon-circle mx-auto">
+                            <i class="fas fa-calendar-check fa-lg text-primary"></i>
+                        </div>
+                    </div>
+                    <h6 class="fw-bold mb-2">Detalles de tu Asesoría</h6>
+                    <p class="text-muted small mb-0">Por favor confirma que los siguientes datos son correctos</p>
+                </div>
+                
+                <div class="detail-list py-3">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="icon-container-sm me-3 mt-1">
+                                    <i class="fas fa-book text-primary"></i>
+                                </div>
+                                <div class="text-start">
+                                    <div class="text-muted fw-bold">Materia</div>
+                                    <div>${materiaText}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="icon-container-sm me-3 mt-1">
+                                    <i class="fas fa-user-tie text-primary"></i>
+                                </div>
+                                <div class="text-start">
+                                    <div class="text-muted fw-bold">Asesor</div>
+                                    <div>${asesorText}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="icon-container-sm me-3 mt-1">
+                                    <i class="fas fa-calendar-alt text-primary"></i>
+                                </div>
+                                <div class="text-start">
+                                    <div class="text-muted fw-bold">Fecha</div>
+                                    <div>${fechaTexto}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="icon-container-sm me-3 mt-1">
+                                    <i class="fas fa-clock text-primary"></i>
+                                </div>
+                                <div class="text-start">
+                                    <div class="text-muted fw-bold">Horario</div>
+                                    <div>${horaTexto}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="icon-container-sm me-3 mt-1">
+                                    <i class="fas fa-hourglass-half text-primary"></i>
+                                </div>
+                                <div class="text-start">
+                                    <div class="text-muted fw-bold">Duración</div>
+                                    <div>${duracion}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex">
+                                <div class="icon-container-sm me-3 mt-1">
+                                    <i class="fas fa-edit text-primary"></i>
+                                </div>
+                                <div class="text-start">
+                                    <div class="text-muted fw-bold">Tema de la asesoría</div>
+                                    <div class="tema-text">${tema}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-msg mt-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        <div>Tu solicitud será enviada al asesor para confirmación.</div>
+                    </div>
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-paper-plane me-2"></i>Confirmar',
+        cancelButtonText: '<i class="fas fa-arrow-left me-2"></i>Editar',
+        buttonsStyling: false,
+        confirmButtonColor: '#1a73e8',
+        cancelButtonColor: '#6c757d',
+        focusConfirm: false,
+        customClass: {
+            popup: 'swal-wide',
+            confirmButton: 'btn btn-primary btn-lg px-4',
+            cancelButton: 'btn btn-outline-secondary btn-lg px-4'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Mostrar mensaje de carga mientras se procesa
+            Swal.fire({
+                title: 'Enviando solicitud...',
+                html: 'Por favor espera mientras procesamos tu solicitud',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Enviar el formulario
+            document.getElementById('formAsesoria').submit();
+        }
+    });
+});
 </script>
+
+<!-- Estilo adicional para la modal -->
+<style>
+    .swal-wide {
+        width: 500px !important;
+        max-width: 95% !important;
+    }
+    
+    .time-slots {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .modal-confirmation .icon-circle {
+        width: 64px;
+        height: 64px;
+        background-color: rgba(26, 115, 232, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    
+    .icon-container-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: rgba(26, 115, 232, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+    
+    .tema-text {
+        word-break: break-word;
+        max-height: 60px;
+        overflow-y: auto;
+    }
+    
+    .detail-list {
+        border-top: 1px solid rgba(0,0,0,0.05);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .info-msg {
+        font-size: 12px;
+        color: #666;
+    }
+    
+    @media (max-width: 768px) {
+        .swal-wide {
+            width: 95% !important;
+        }
+    }
+    
+    .btn-lg {
+        padding: 0.45rem 0.9rem;
+        font-size: 0.95rem;
+    }
+</style>
 @endsection
