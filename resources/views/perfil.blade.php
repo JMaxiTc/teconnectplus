@@ -3,6 +3,11 @@
 @section('styles')
 <link rel="stylesheet" href="{{ asset('assets/perfil.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/perfil-layout.css') }}">
+<link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+@endsection
+
+@section('scripts')
+<script src="{{ asset('js/toggle-estado.js') }}"></script>
 @endsection
 
 @section('content')
@@ -312,7 +317,150 @@
             </form>
         </div>
     </div>
+
+@if (auth()->user()->rol === 'ASESOR')
+<div class="card mt-5 shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Horario de Disponibilidad</h5>
+        <div class="form-check form-switch text-white">
+            <input class="form-check-input" type="checkbox" id="toggleInactivos">
+            <label class="form-check-label small" for="toggleInactivos">
+                <i class="fas fa-filter"></i> Mostrar horarios inactivos
+            </label>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            <div>Completa tu horario de disponibilidad para que los estudiantes puedan agendar asesorías contigo. Los horarios <strong>activos</strong> serán visibles para los estudiantes.</div>
+        </div>
+
+        <h6 class="text-primary"><i class="fas fa-table me-1"></i>Mis horarios disponibles</h6>
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Día</th>
+                        <th>Hora inicio</th>
+                        <th>Hora fin</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaHorarios">
+                    @foreach ($usuario->disponibilidades->where('id_asesor', Auth::id()) as $disp)
+                    <tr class="{{ $disp->estado === 'INACTIVO' ? 'fila-inactiva d-none' : '' }}" data-id="{{ $disp->id_disponibilidad }}">
+                        <td class="dia">{{ $disp->dia_semana }}</td>
+                        <td class="inicio">{{ \Carbon\Carbon::parse($disp->hora_inicio)->format('g:i A') }}</td>
+                        <td class="fin">{{ \Carbon\Carbon::parse($disp->hora_fin)->format('g:i A') }}</td>
+                        <td class="estado">
+                            <button class="btn btn-sm toggle-estado {{ $disp->estado === 'ACTIVO' ? 'btn-outline-success' : 'btn-outline-secondary' }}">
+                                {{ $disp->estado }}
+                            </button>
+                        </td>
+                        <td class="acciones">
+                            <button class="btn btn-sm btn-outline-primary editar-horario">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <h6 class="text-primary"><i class="fas fa-plus-circle me-1"></i>Registrar nuevo horario</h6>
+        <form id="formNuevoHorario" method="POST" action="{{ route('perfil.disponibilidad.guardar') }}">
+            @csrf
+            <div class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small"><i class="fas fa-calendar-alt me-1"></i>Día</label>
+                    <select id="nuevoDia" name="dias[]" class="form-select" required>
+
+                        <option value="">Seleccionar día</option>
+                        @foreach(['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'] as $dia)
+                            <option value="{{ $dia }}">{{ $dia }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small"><i class="fas fa-hourglass-start me-1"></i>Hora inicio</label>
+                    <select id="nuevoInicio" name="hora_inicio[]" class="form-select scroll-select" required>
+
+                        @for ($h = 7; $h <= 21; $h++)
+                            <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}:00:00">{{ date('g:i A', strtotime("$h:00")) }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small"><i class="fas fa-hourglass-end me-1"></i>Hora fin</label>
+                    <select id="nuevoFin" name="hora_fin[]" class="form-select scroll-select" required>
+
+                        @for ($h = 8; $h <= 22; $h++)
+                            <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}:00:00">{{ date('g:i A', strtotime("$h:00")) }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary mt-1"><i class="fas fa-save me-1"></i>Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
+@endif
+
+<!-- Modal editar horario -->
+<div class="modal fade" id="modalEditarHorario" tabindex="-1" aria-labelledby="modalEditarHorarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="formEditarHorario" class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="fas fa-edit me-1"></i> Editar horario</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body row g-3">
+        <input type="hidden" id="editId">
+
+        <div class="col-md-12">
+          <label class="form-label small">Día</label>
+          <select class="form-select" id="editDia">
+            @foreach(['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'] as $dia)
+                <option value="{{ $dia }}">{{ $dia }}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small">Hora inicio</label>
+          <select class="form-select" id="editInicio">
+            @for ($h = 7; $h <= 21; $h++)
+                <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}:00:00">{{ date('g:i A', strtotime("$h:00")) }}</option>
+            @endfor
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small">Hora fin</label>
+          <select class="form-select" id="editFin">
+            @for ($h = 8; $h <= 22; $h++)
+                <option value="{{ str_pad($h, 2, '0', STR_PAD_LEFT) }}:00:00">{{ date('g:i A', strtotime("$h:00")) }}</option>
+            @endfor
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+</div>
+
+
 
 <!-- Toast para notificaciones -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
@@ -529,6 +677,243 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+    
 });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const csrf = document.querySelector('meta[name="csrf-token"]').content;
+    let modal = new bootstrap.Modal(document.getElementById('modalEditarHorario'));
+
+    document.getElementById('toggleInactivos').addEventListener('change', function () {
+        document.querySelectorAll('.fila-inactiva').forEach(f => f.classList.toggle('d-none', !this.checked));
+    });
+
+    document.querySelectorAll('.toggle-estado').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const tr = this.closest('tr');
+            const id = tr.dataset.id;
+
+            const res = await fetch(`/perfil/disponibilidad/${id}/estado`, {
+                method: 'PATCH',
+                headers: { 'X-CSRF-TOKEN': csrf }
+            });
+
+            if (res.ok) {
+                this.innerText = this.innerText === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+                this.classList.toggle('btn-outline-success');
+                this.classList.toggle('btn-outline-secondary');
+                tr.classList.toggle('fila-inactiva');
+            }
+        });
+    });
+
+    document.getElementById('formNuevoHorario').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const fd = new FormData(this);
+
+        const res = await fetch(this.action, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' },
+            body: fd
+        });
+
+        if (res.ok) location.reload();
+    });
+
+    document.querySelectorAll('.editar-horario').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const tr = this.closest('tr');
+            document.getElementById('editId').value = tr.dataset.id;
+            document.getElementById('editDia').value = tr.querySelector('.dia').textContent.trim();
+            document.getElementById('editInicio').value = convertToTime(tr.querySelector('.inicio').textContent.trim());
+            document.getElementById('editFin').value = convertToTime(tr.querySelector('.fin').textContent.trim());
+            modal.show();
+        });
+    });
+
+    document.getElementById('formEditarHorario').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const id = document.getElementById('editId').value;
+
+        const res = await fetch(`/perfil/disponibilidad/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'X-CSRF-TOKEN': csrf,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                dia_semana: document.getElementById('editDia').value,
+                hora_inicio: document.getElementById('editInicio').value,
+                hora_fin: document.getElementById('editFin').value
+            })
+        });
+
+        if (res.ok) location.reload();
+    });
+
+    function convertToTime(str) {
+        const [hora, ampm] = str.split(' ');
+        let [h, m] = hora.split(':');
+        h = parseInt(h);
+        if (ampm === 'PM' && h < 12) h += 12;
+        if (ampm === 'AM' && h === 12) h = 0;
+        return `${h.toString().padStart(2, '0')}:${m}:00`;
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const horarios = @json($usuario->disponibilidades);
+
+    const selectDia = document.getElementById('nuevoDia');
+    const selectInicio = document.getElementById('nuevoInicio');
+    const selectFin = document.getElementById('nuevoFin');
+
+    selectDia?.addEventListener('change', function () {
+        const diaSeleccionado = this.value;
+
+        // Resetear selects
+        selectInicio.innerHTML = '';
+        selectFin.innerHTML = '';
+
+        // Rango total de horas permitidas
+        const horas = [];
+        for (let h = 7; h <= 21; h++) {
+            const horaStr = `${String(h).padStart(2, '0')}:00:00`;
+            horas.push(horaStr);
+        }
+
+        // Filtrar los horarios ocupados del día
+        const ocupados = horarios
+            .filter(h => h.dia_semana === diaSeleccionado)
+            .map(h => [h.hora_inicio, h.hora_fin]);
+
+        // Filtrar horas disponibles
+        const disponibles = horas.filter(h => {
+            return !ocupados.some(([inicio, fin]) => h >= inicio && h < fin);
+        });
+
+        // Llenar select de inicio
+        disponibles.forEach(h => {
+            const label = formatHora(h);
+            const opt = document.createElement('option');
+            opt.value = h;
+            opt.textContent = label;
+            selectInicio.appendChild(opt);
+        });
+
+        // Llenar select de fin (mayor a inicio dinámicamente al elegir)
+        selectInicio.addEventListener('change', function () {
+            const horaSeleccionada = this.value;
+            selectFin.innerHTML = '';
+            disponibles.forEach(h => {
+                if (h > horaSeleccionada) {
+                    const opt = document.createElement('option');
+                    opt.value = h;
+                    opt.textContent = formatHora(h);
+                    selectFin.appendChild(opt);
+                }
+            });
+        });
+
+        // Disparar una vez para inicializar fin
+        selectInicio.dispatchEvent(new Event('change'));
+    });
+
+    function formatHora(hora) {
+        const [h, m] = hora.split(':');
+        const hNum = parseInt(h);
+        const ampm = hNum >= 12 ? 'PM' : 'AM';
+        const h12 = hNum % 12 === 0 ? 12 : hNum % 12;
+        return `${h12}:${m} ${ampm}`;
+    }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const horarios = @json($usuario->disponibilidades);
+
+    const editDia = document.getElementById('editDia');
+    const editInicio = document.getElementById('editInicio');
+    const editFin = document.getElementById('editFin');
+    const editId = document.getElementById('editId');
+
+    // Al abrir el modal, ya estamos cargando los valores, ahora solo filtramos
+    editDia.addEventListener('change', actualizarHorasEditables);
+    editInicio.addEventListener('change', actualizarFinEditable);
+
+    function actualizarHorasEditables() {
+        const dia = editDia.value;
+        const idActual = editId.value;
+
+        const horas = [];
+        for (let h = 7; h <= 21; h++) {
+            horas.push(`${String(h).padStart(2, '0')}:00:00`);
+        }
+
+        const ocupados = horarios
+            .filter(h => h.dia_semana === dia && h.id_disponibilidad != idActual)
+            .map(h => [h.hora_inicio, h.hora_fin]);
+
+        const disponibles = horas.filter(h => {
+            return !ocupados.some(([inicio, fin]) => h >= inicio && h < fin);
+        });
+
+        // Guardar hora seleccionada para no perderla al cambiar día
+        const valorActualInicio = editInicio.value;
+        const valorActualFin = editFin.value;
+
+        editInicio.innerHTML = '';
+        disponibles.forEach(h => {
+            const opt = document.createElement('option');
+            opt.value = h;
+            opt.textContent = formatHora(h);
+            if (h === valorActualInicio) opt.selected = true;
+            editInicio.appendChild(opt);
+        });
+
+        actualizarFinEditable();
+    }
+
+    function actualizarFinEditable() {
+        const horaInicio = editInicio.value;
+        const horaFinActual = editFin.value;
+
+        const opcionesDisponibles = [...editInicio.options].map(opt => opt.value);
+        const opcionesFin = opcionesDisponibles.filter(h => h > horaInicio);
+
+        editFin.innerHTML = '';
+        opcionesFin.forEach(h => {
+            const opt = document.createElement('option');
+            opt.value = h;
+            opt.textContent = formatHora(h);
+            if (h === horaFinActual) opt.selected = true;
+            editFin.appendChild(opt);
+        });
+    }
+
+    function formatHora(hora) {
+        const [h, m] = hora.split(':');
+        const hNum = parseInt(h);
+        const ampm = hNum >= 12 ? 'PM' : 'AM';
+        const h12 = hNum % 12 === 0 ? 12 : hNum % 12;
+        return `${h12}:${m} ${ampm}`;
+    }
+
+    // También actualiza al abrir modal
+    document.querySelectorAll('.editar-horario').forEach(btn => {
+        btn.addEventListener('click', () => {
+            setTimeout(actualizarHorasEditables, 200); // Espera a que se cargue el valor en editDia
+        });
+    });
+});
+</script>
+
+
+
+
 @endsection

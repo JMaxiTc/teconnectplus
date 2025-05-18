@@ -10,6 +10,7 @@ use App\Http\Controllers\AsesorMateriaController;
 use App\Http\Controllers\VideollamadaController;
 use App\Http\Controllers\CalificacionesController;
 
+
 Route::get('/', function(){
     return app(CatalogosController::class)->index();
 });
@@ -121,3 +122,9 @@ Route::middleware(['auth', 'can:ASESOR'])->group(function () {
     })->name('asesoriasa.index');
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::post('/perfil/disponibilidad', [UserController::class, 'guardarDisponibilidad'])->name('perfil.disponibilidad.guardar');
+    Route::patch('/perfil/disponibilidad/{id}/estado', [UserController::class, 'cambiarEstadoDisponibilidad'])->name('perfil.disponibilidad.estado');
+    Route::patch('/perfil/disponibilidad/{id}', [UserController::class, 'actualizarDisponibilidad'])->name('perfil.disponibilidad.actualizar');
+
+});

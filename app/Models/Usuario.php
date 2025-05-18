@@ -104,4 +104,10 @@ public function asesorias()
     return $this->hasMany(Asesoria::class, 'fk_id_asesor', 'id_usuario');
 }
 
+public function disponibilidades()
+{
+    return $this->hasMany(DisponibilidadAsesor::class, 'id_asesor', 'id_usuario');
+}
+
+
 }

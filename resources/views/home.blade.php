@@ -34,6 +34,36 @@
 
 @if(Auth::user()->esAsesor())
 <div class="role-asesor-only mb-4">
+    @php
+        $disponibilidades = Auth::user()->disponibilidades()->count();
+        $disponibilidadesActivas = Auth::user()->disponibilidades()->where('estado', 'ACTIVO')->count();
+    @endphp
+
+    @if($disponibilidades === 0 || $disponibilidadesActivas === 0)
+    <div class="alert alert-warning mb-4 shadow-sm border-left-warning">
+        <div class="d-flex align-items-center">
+            <div class="flex-shrink-0 me-3">
+                <i class="fas fa-exclamation-circle fa-2x text-warning"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h5 class="alert-heading">¡Completa tu perfil como asesor!</h5>
+                <p class="mb-0">
+                    @if($disponibilidades === 0)
+                    Para que los estudiantes puedan agendar asesorías contigo, es necesario que registres tu disponibilidad de horario.
+                    @else
+                    No tienes horarios activos. Para que los estudiantes puedan agendar asesorías contigo, es necesario que actives al menos un horario de disponibilidad.
+                    @endif
+                </p>
+                <div class="mt-2">
+                    <a href="{{ route('perfil.show') }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-clock me-1"></i> Configurar mi horario
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="card border-primary">
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0">Panel de Asesor</h5>
@@ -171,6 +201,10 @@
         text-align: center;
         border-radius: 8px;
         margin-bottom: 40px;
+    }
+
+    .border-left-warning {
+        border-left: 4px solid #ffc107;
     }
 
     .hero-section h1 {
