@@ -33,6 +33,11 @@ Route::middleware('auth')->group(function () {
     
     // Ruta para guardar calificaciones
     Route::post('/calificaciones/guardar', [CalificacionesController::class, 'guardarCalificacion'])->name('calificaciones.guardar');
+    
+    // Ruta de depuración (solo en ambiente local)
+    if (app()->environment('local')) {
+        Route::get('/debug/crear-disponibilidades', [App\Http\Controllers\DebugController::class, 'crearDisponibilidadPrueba'])->name('debug.disponibilidades');
+    }
 
     Route::get('/catalogos/materias', [CatalogosController::class, 'materiasGet']);
     Route::get('/catalogos/materias/agregar', [CatalogosController::class, 'materiasAgregarGet']);
@@ -69,6 +74,7 @@ Route::middleware(['auth', 'can:ESTUDIANTE'])->group(function () {
     Route::get('/asesorias/solicitar', [AsesoriasController::class, 'estudianteSolicitarGet'])->name('asesorias.solicitar.get');
     Route::post('/asesorias/solicitar', [AsesoriasController::class, 'estudianteSolicitarPost'])->name('asesorias.solicitar.post');
     Route::get('/asesorias/asesores/{id_materia}', [AsesoriasController::class, 'asesoresPorMateria'])->name('asesorias.asesores');
+    Route::get('/asesorias/disponibilidades/{id_asesor}/{fecha}', [AsesoriasController::class, 'disponibilidadesAsesor'])->name('asesorias.disponibilidades');
     
     // Asesorías Activas (CONFIRMADA, PROCESO) - Página principal
     Route::get('/asesorias', [AsesoriasController::class, 'estudianteAsesoriasActivasGet'])->name('asesorias.index');

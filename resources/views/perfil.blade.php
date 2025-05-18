@@ -381,7 +381,7 @@
                     <select id="nuevoDia" name="dias[]" class="form-select" required>
 
                         <option value="">Seleccionar día</option>
-                        @foreach(['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'] as $dia)
+                        @foreach(['Lunes','Martes','Miércoles','Jueves','Viernes'] as $dia)
                             <option value="{{ $dia }}">{{ $dia }}</option>
                         @endforeach
                     </select>

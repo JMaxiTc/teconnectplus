@@ -289,32 +289,50 @@
                                     </p>
                                 @else
                                     <!-- Si no hay un enlace guardado -->
-                                    <p class="text-muted">Crea una nueva reunión de Google Meet para esta asesoría.</p>
-                                    <a href="{{ $videoconferenciaUrl }}" target="_blank" class="btn btn-outline-primary mt-1">
-                                        <i class="fas fa-video me-2"></i>
-                                        Crear reunión Meet
-                                    </a>
-                                    <p class="small text-muted mt-2">
-                                        1. Crea una nueva reunión con el botón de arriba<br>
-                                        2. Una vez creada, copia el enlace y guárdalo abajo<br>
-                                        3. También puedes pedirle al estudiante que cree la reunión
-                                    </p>                                    
-                                    <!-- Formulario para guardar el enlace de Meet -->
-                                    <form action="{{ route('asesoriasa.guardar.meet') }}" method="POST" class="mt-3">
-                                        @csrf
-                                        <input type="hidden" name="id_asesoria" value="{{ $asesoria->id_asesoria }}">
-                                        <div class="input-group">
-                                            <input type="url" class="form-control" name="enlace_meet" 
-                                                placeholder="Pega aquí el enlace de Google Meet" 
-                                                required pattern="https://meet\.google\.com/.*">
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="fas fa-save"></i> Guardar
-                                            </button>
+                                    @if($asesoria->estado === 'PROCESO')
+                                        <p class="text-muted">Crea una nueva reunión de Google Meet para esta asesoría.</p>
+                                        <a href="{{ $videoconferenciaUrl }}" target="_blank" class="btn btn-outline-primary mt-1">
+                                            <i class="fas fa-video me-2"></i>
+                                            Crear reunión Meet
+                                        </a>
+                                        <p class="small text-muted mt-2">
+                                            1. Crea una nueva reunión con el botón de arriba<br>
+                                            2. Una vez creada, copia el enlace y guárdalo abajo<br>
+                                            3. También puedes pedirle al estudiante que cree la reunión
+                                        </p>                                    
+                                        <!-- Formulario para guardar el enlace de Meet -->
+                                        <form action="{{ route('asesoriasa.guardar.meet') }}" method="POST" class="mt-3">
+                                            @csrf
+                                            <input type="hidden" name="id_asesoria" value="{{ $asesoria->id_asesoria }}">
+                                            <div class="input-group">
+                                                <input type="url" class="form-control" name="enlace_meet" 
+                                                    placeholder="Pega aquí el enlace de Google Meet" 
+                                                    required pattern="https://meet\.google\.com/.*">
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="fas fa-save"></i> Guardar
+                                                </button>
+                                            </div>
+                                            <div class="form-text text-muted">
+                                                Debe comenzar con https://meet.google.com/
+                                            </div>
+                                        </form>
+                                    @else
+                                        <div class="alert alert-warning" role="alert">
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-container-sm bg-warning text-white rounded-circle me-3 p-2">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="mb-0">Tienes que iniciar la sesión primero Usando el botón <strong>"Iniciar Asesoría"</strong>.</p>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <p class="mb-0 text-center">
+                                                <i class="fas fa-arrow-left me-1"></i>
+                                                Busca el botón en la columna izquierda
+                                            </p>
                                         </div>
-                                        <div class="form-text text-muted">
-                                            Debe comenzar con https://meet.google.com/
-                                        </div>
-                                    </form>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -376,4 +394,31 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Estilos para el mensaje de alerta de videoconferencia */
+.icon-container-sm {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.alert-warning {
+    border-left: 4px solid #ffc107;
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.alert-warning .alert-heading {
+    color: #856404;
+    font-weight: 600;
+}
+
+.alert hr {
+    margin: 1rem 0;
+    opacity: 0.2;
+}
+</style>
 @endsection

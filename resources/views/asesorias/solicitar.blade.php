@@ -279,11 +279,33 @@ document.getElementById('materiaSelect').addEventListener('change', function () 
     
     asesorSelect.classList.add('loading');
     
+    console.log('Fetching advisors for materia ID:', materiaId);
+    
     fetch(`/asesorias/asesores/${materiaId}`)
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response received');
+            console.log('Status:', response.status);
+            console.log('Status Text:', response.statusText);
+            console.log('Content Type:', response.headers.get('content-type'));
+            
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+            }
+            
+            return response.json().catch(e => {
+                console.error('Error parsing JSON:', e);
+                throw new Error('Error al procesar la respuesta del servidor');
+            });
+        })
         .then(data => {
+            console.log('Datos recibidos:', data);
             asesorSelect.innerHTML = '';
-            if (data.length === 0) {
+            
+            if (data.error) {
+                console.error('Error del servidor:', data.error);
+                asesorSelect.innerHTML = '<option value="">Error del servidor: ' + data.error + '</option>';
+                asesorCount.textContent = '0';
+            } else if (data.length === 0) {
                 asesorSelect.innerHTML = '<option value="">No hay asesores disponibles</option>';
                 asesorCount.textContent = '0';
             } else {
@@ -293,13 +315,25 @@ document.getElementById('materiaSelect').addEventListener('change', function () 
                 });
                 asesorCount.textContent = data.length;
             }
+            
             asesorSelect.disabled = false;
             asesorSelect.classList.remove('loading');
         })
         .catch(error => {
             console.error('Error cargando asesores:', error);
-            asesorSelect.innerHTML = '<option value="">Error al cargar asesores</option>';
+            asesorSelect.innerHTML = '<option value="">Error al cargar asesores: ' + error.message + '</option>';
+            asesorSelect.disabled = true;
             asesorSelect.classList.remove('loading');
+            asesorCount.textContent = '0';
+            
+            // Mostrar alerta para el usuario
+            Swal.fire({
+                title: '¡Error!',
+                text: 'No se pudieron cargar los asesores para esta materia. Por favor intente de nuevo más tarde.',
+                icon: 'error',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#1a73e8'
+            });
         });
 });
 
@@ -395,55 +429,102 @@ function mostrarHorasDisponibles(asesorId, fecha) {
             <span>Consultando horarios disponibles...</span>
         </div>`;
     
-    // Simulamos una petición al servidor con datos consistentes basados en la fecha y el asesor
-    setTimeout(() => {
-        // Generar horas disponibles basadas en la fecha y el asesor
-        const fecha_obj = new Date(fecha);
-        const dia = fecha_obj.getDay(); // 0 (domingo) a 6 (sábado)
-        const semilla = fecha_obj.getDate() + parseInt(asesorId); // Crear pseudo-aleatoriedad consistente
-        
-        const horasDisponibles = generarHorasDisponibles(dia, semilla);
-        
-        if (horasDisponibles.length === 0) {
-            selectorHora.innerHTML = `
-                <div class="alert alert-warning mb-0">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
-                        <div>
-                            <strong>Sin disponibilidad</strong>
-                            <div>No hay horarios disponibles para esta fecha. Por favor, seleccione otra fecha.</div>
-                        </div>
-                    </div>
-                </div>`;
-            return;
-        }
-        
-        // Para sesiones de 2 horas, eliminar los horarios que no tienen al menos 2 horas consecutivas disponibles
-        let horasFiltradas = horasDisponibles;
-        if (duracionSeleccionada === 120) {
-            horasFiltradas = horasDisponibles.filter(hora => {
-                const horaActual = parseInt(hora.split(':')[0]);
-                const minutos = hora.split(':')[1] === '30' ? 30 : 0;
+    // Hacer una petición AJAX para obtener las disponibilidades reales del asesor
+    fetch(`/asesorias/disponibilidades/${asesorId}/${fecha}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al obtener disponibilidades');
+            }
+            return response.json();
+        })
+        .then(horasDisponibles => {
+            console.log('Disponibilidades recibidas:', horasDisponibles); // Para depuración
+            
+            if (horasDisponibles.length === 0) {
+                // Obtener el día de la semana
+                const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                const fechaObj = new Date(fecha);
+                const diaSemana = dias[fechaObj.getDay()];
                 
-                // Verificar si hay otro horario disponible después de 1 hora
-                const siguienteHora = `${(horaActual + 1).toString().padStart(2, '0')}:${minutos}`;
-                return horasDisponibles.includes(siguienteHora);
-            });
-        }
-        
-        if (horasFiltradas.length === 0) {
-            selectorHora.innerHTML = `
-                <div class="alert alert-warning mb-0">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
-                        <div>
-                            <strong>Sin disponibilidad</strong>
-                            <div>No hay bloques de ${duracionSeleccionada === 120 ? '2 horas' : '1 hora'} disponibles para esta fecha.</div>
+                selectorHora.innerHTML = `
+                    <div class="alert alert-warning mb-0">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
+                            <div>
+                                <strong>Sin disponibilidad</strong>
+                                <div>El asesor no tiene horarios configurados para los ${diaSemana}s. Por favor, seleccione otra fecha u otro asesor.</div>
+                            </div>
                         </div>
-                    </div>
-                </div>`;
-            return;
-        }
+                    </div>`;
+                return;
+            }
+            
+            // Para sesiones de 2 horas, necesitamos verificar que haya 2 bloques consecutivos de 30 minutos
+            let horasFiltradas = horasDisponibles;
+            if (duracionSeleccionada === 120) {
+                // Log original de horarios disponibles
+                console.log("Horarios disponibles originales:", horasDisponibles);
+                
+                // Agrupar por consecutivos para identificar grupos
+                let grupos = [];
+                
+                if (horasDisponibles.length > 0) {
+                    let grupoActual = [horasDisponibles[0]];
+                    
+                    for (let i = 1; i < horasDisponibles.length; i++) {
+                        if (esSlotConsecutivo(horasDisponibles[i-1], horasDisponibles[i])) {
+                            grupoActual.push(horasDisponibles[i]);
+                        } else {
+                            if (grupoActual.length > 0) {
+                                grupos.push([...grupoActual]);
+                            }
+                            grupoActual = [horasDisponibles[i]];
+                        }
+                    }
+                    
+                    if (grupoActual.length > 0) {
+                        grupos.push(grupoActual);
+                    }
+                }
+                
+                console.log("Grupos de horarios consecutivos:", grupos);
+                
+                // Filtrar solo los grupos que tienen al menos 4 slots consecutivos de 30 minutos (2 horas)
+                const gruposFiltrados = grupos.filter(g => g.length >= 4);
+                console.log("Grupos con al menos 4 slots (2 horas):", gruposFiltrados);
+                
+                // Extraer las horas iniciales de cada grupo válido
+                const horasIniciales = gruposFiltrados.map(g => g[0]);
+                console.log("Horas iniciales para bloques de 2 horas:", horasIniciales);
+                
+                // Usamos directamente las horas iniciales como horas filtradas
+                horasFiltradas = horasIniciales;
+            } else if (duracionSeleccionada === 60) {
+                // Para sesiones de 1 hora, necesitamos verificar que haya 2 bloques consecutivos de 30 minutos
+                horasFiltradas = horasDisponibles.filter((hora, index) => {
+                    if (index + 1 >= horasDisponibles.length) return false;
+                    
+                    // Verificar que el siguiente slot de 30 minutos también esté disponible
+                    const horaActual = hora;
+                    const siguienteSlot = horasDisponibles[index + 1];
+                    
+                    return esSlotConsecutivo(horaActual, siguienteSlot);
+                });
+            }
+            
+            if (horasFiltradas.length === 0) {
+                selectorHora.innerHTML = `
+                    <div class="alert alert-warning mb-0">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
+                            <div>
+                                <strong>Sin disponibilidad</strong>
+                                <div>No hay bloques de ${duracionSeleccionada === 120 ? '2 horas' : '1 hora'} disponibles para esta fecha.</div>
+                            </div>
+                        </div>
+                    </div>`;
+                return;
+            }
         
         // Preparar contenedor para los horarios
         selectorHora.innerHTML = '';
@@ -455,7 +536,38 @@ function mostrarHorasDisponibles(asesorId, fecha) {
         const horariosMañana = [];
         const horariosTarde = [];
         
-        horasFiltradas.forEach(hora => {
+        // En caso de 1 hora, mostramos bloques de 1 hora
+        // En caso de 2 horas, mostramos bloques de 2 horas
+        // Pero solo consideramos los horarios de inicio (el primer slot de cada bloque)
+        let horariosAMostrar = [];
+        
+        console.log("Horas filtradas antes de procesar mañana/tarde:", horasFiltradas);
+        
+        if (duracionSeleccionada === 60) {
+            // Para 1 hora, mostrar solo los inicios de cada hora disponible
+            console.log('Filtrando para bloques de 1 hora');
+            horariosAMostrar = [];
+            
+            for (let i = 0; i < horasFiltradas.length - 1; i++) {
+                const hora1 = horasFiltradas[i];
+                const hora2 = horasFiltradas[i + 1];
+                
+                if (esSlotConsecutivo(hora1, hora2)) {
+                    horariosAMostrar.push(hora1);
+                    console.log(`Bloque de 1 hora encontrado: ${hora1} a ${hora2}`);
+                }
+            }
+        } else if (duracionSeleccionada === 120) {
+            // Para 2 horas, mostrar solo los horarios iniciales de cada bloque válido
+            console.log('Filtrando para bloques de 2 horas. Total slots disponibles:', horasFiltradas.length);
+            
+            // Ya tenemos las horasFiltradas con solo los inicios de bloques válidos de 2 horas
+            // Las usamos directamente, sin volver a filtrar
+            horariosAMostrar = [...horasFiltradas];
+            console.log('Horarios a mostrar para 2 horas:', horariosAMostrar);
+        }
+        
+        horariosAMostrar.forEach(hora => {
             const horaNum = parseInt(hora.split(':')[0]);
             if (horaNum < 12) {
                 horariosMañana.push(hora);
@@ -490,24 +602,67 @@ function mostrarHorasDisponibles(asesorId, fecha) {
             
             agregarBotonesHorario(horariosTarde, contenedorHorariosTarde);
         }
-    }, 800);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        selectorHora.innerHTML = `
+            <div class="alert alert-danger mb-0">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-circle me-3 fa-lg"></i>
+                    <div>
+                        <strong>Error</strong>
+                        <div>Ocurrió un error al consultar las disponibilidades. Por favor, inténtelo de nuevo.</div>
+                    </div>
+                </div>
+            </div>`;
+    });
+}
+
+/**
+ * Verifica si dos slots de tiempo son consecutivos (separados por 30 minutos)
+ */
+function esSlotConsecutivo(slot1, slot2) {
+    if (!slot1 || !slot2) return false;
+    
+    const [hora1, minuto1] = slot1.split(':').map(Number);
+    const [hora2, minuto2] = slot2.split(':').map(Number);
+    
+    const minutosTotal1 = (hora1 * 60) + minuto1;
+    const minutosTotal2 = (hora2 * 60) + minuto2;
+    
+    // Verificar si hay exactamente 30 minutos de diferencia
+    return (minutosTotal2 - minutosTotal1) === 30;
 }
 
 function agregarBotonesHorario(horas, container) {
+    if (!horas || horas.length === 0) {
+        console.log('No hay horas para mostrar');
+        return;
+    }
+    
+    console.log('Agregando botones para horas:', horas);
+    
     horas.forEach(hora => {
         const botonHora = document.createElement('button');
         botonHora.type = 'button';
         botonHora.className = 'btn btn-outline-primary hora-btn';
         
         if (duracionSeleccionada === 120) {
-            // Para 2 horas, mostrar el rango completo
+            // Para 2 horas (4 slots de 30 minutos)
             const horaInicio = hora;
             const horaParts = hora.split(':');
             const horaNum = parseInt(horaParts[0]);
-            const minutos = horaParts[1];
+            const minutos = parseInt(horaParts[1] || 0);
             
-            const horaFinNum = horaNum + 2;
-            const horaFin = `${horaFinNum.toString().padStart(2, '0')}:${minutos}`;
+            // Calcular hora de fin (2 horas después)
+            let horaFin;
+            if (minutos === 30) {
+                // Si empieza en hora y media, termina 2 horas después
+                horaFin = `${(horaNum + 2).toString().padStart(2, '0')}:30`;
+            } else {
+                // Si empieza en hora en punto, termina 2 horas después
+                horaFin = `${(horaNum + 2).toString().padStart(2, '0')}:00`;
+            }
             
             // Formatear la hora para mostrar AM/PM
             const horaInicioFormateada = formatearHora(horaInicio);
@@ -518,20 +673,28 @@ function agregarBotonesHorario(horas, container) {
             botonHora.dataset.horaFin = horaFin;
             botonHora.dataset.horaTexto = `${horaInicioFormateada} - ${horaFinFormateada}`;
         } else {
-            // Para 1 hora, mostrar la hora de inicio y calcular la hora final
+            // Para 1 hora (2 slots de 30 minutos)
+            const horaInicio = hora;
             const horaParts = hora.split(':');
             const horaNum = parseInt(horaParts[0]);
-            const minutos = horaParts[1];
+            const minutos = parseInt(horaParts[1] || 0);
             
-            const horaFinNum = horaNum + 1;
-            const horaFin = `${horaFinNum.toString().padStart(2, '0')}:${minutos}`;
+            // Calcular hora de fin (1 hora después)
+            let horaFin;
+            if (minutos === 30) {
+                // Si empieza en hora y media, termina 1 hora después
+                horaFin = `${(horaNum + 1).toString().padStart(2, '0')}:30`;
+            } else {
+                // Si empieza en hora en punto, termina 1 hora después
+                horaFin = `${(horaNum + 1).toString().padStart(2, '0')}:00`;
+            }
             
             // Formatear la hora para mostrar AM/PM
-            const horaInicioFormateada = formatearHora(hora);
+            const horaInicioFormateada = formatearHora(horaInicio);
             const horaFinFormateada = formatearHora(horaFin);
             
             botonHora.innerHTML = `<span>${horaInicioFormateada}</span> <i class="fas fa-arrow-right mx-1 small"></i> <span>${horaFinFormateada}</span>`;
-            botonHora.dataset.horaInicio = hora;
+            botonHora.dataset.horaInicio = horaInicio;
             botonHora.dataset.horaFin = horaFin;
             botonHora.dataset.horaTexto = `${horaInicioFormateada} - ${horaFinFormateada}`;
         }
@@ -610,12 +773,22 @@ function generarHorasDisponibles(dia, semilla) {
 
 // Formatear hora para mostrar en formato 12h (AM/PM)
 function formatearHora(hora24) {
-    const [hora, minutos] = hora24.split(':');
+    if (!hora24) return '';
+    
+    // Asegurarse de que tenga el formato correcto HH:MM
+    let hora, minutos;
+    if (hora24.includes(':')) {
+        [hora, minutos] = hora24.split(':');
+    } else {
+        hora = hora24;
+        minutos = '00';
+    }
+    
     const horaNum = parseInt(hora);
     const periodo = horaNum >= 12 ? 'PM' : 'AM';
     const hora12 = horaNum > 12 ? horaNum - 12 : (horaNum === 0 ? 12 : horaNum);
     
-    return `${hora12}:${minutos} ${periodo}`;
+    return `${hora12}:${minutos || '00'} ${periodo}`;
 }
 
 // Formatear la fecha para mostrarla al usuario
