@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
+use App\Models\Asesoria;
+use App\Models\Materia;
+use App\Models\Recurso;
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
@@ -112,4 +115,33 @@ class AdminController extends Controller
         return redirect('/admin/usuarios');
     }
 
+    public function contenido()
+    {
+        // Ejemplo: Obtener lista de materiales
+        $materiales = Recurso::all();
+
+        return view('admin.contenido', [
+            'materiales' => $materiales
+        ]);
+    }
+
+    public function notificaciones()
+    {
+        // Ejemplo: Mostrar formulario para enviar notificaciones
+        return view('admin.notificaciones');
+    }
+
+    public function enviarNotificacion(Request $request)
+    {
+        // Ejemplo: Lógica para enviar notificaciones
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'mensaje' => 'required|string'
+        ]);
+
+        // Aquí se enviaría la notificación (ejemplo simplificado)
+        // Notificacion::create([...]);
+
+        return redirect()->route('admin.notificaciones')->with('success', 'Notificación enviada correctamente.');
+    }
 }

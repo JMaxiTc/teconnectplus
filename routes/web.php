@@ -55,17 +55,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/csrf-token', function () {
         return response()->json(['token' => csrf_token()]);
     });
-    
-
-    // Aquí puedes añadir otras rutas que requieran autenticación
-    // como las rutas para asesorías y materiales
 });
-Route::middleware('auth','can:ADMIN')->group(function () {
+Route::middleware(['auth', 'can:ADMIN'])->group(function () {
     Route::get('/admin/usuarios', [AdminController::class, 'usuariosGet']);
     Route::get('/admin/usuarios/agregar', [AdminController::class, 'usuariosAgregarGet']);
     Route::post('/admin/usuarios/agregar', [AdminController::class, 'usuariosAgregarPost']);
     Route::get('/admin/usuarios/{id_usuario}/actualizar', [AdminController::class, 'usuariosActualizarGet']);
     Route::post('/admin/usuarios/{id_usuario}/actualizar', [AdminController::class, 'usuariosActualizarPost']);
+    Route::get('/admin/notificaciones', [AdminController::class, 'notificaciones'])->name('admin.notificaciones');
+    Route::post('/admin/notificaciones', [AdminController::class, 'enviarNotificacion'])->name('admin.notificaciones.post');
 });
 
 // Estudiante

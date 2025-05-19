@@ -101,9 +101,6 @@ class AuthController extends Controller
         $maxId = Usuario::max('id_usuario') ?? 0;
         $newId = $maxId + 1;
 
-        // Formatear la carrera: primera letra mayúscula y el resto en minúsculas
-        $carrera = ucfirst(strtolower($request->carrera));
-
         $usuario = Usuario::create([
             'id_usuario' => $newId,
             'nombre' => $request->nombre,
@@ -112,7 +109,7 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'fechaNacimiento' => $request->fechaNacimiento,
             'id_genero' => $request->id_genero,
-            'carrera' => $carrera,
+            'carrera' => strtoupper($request->carrera), // Convertir a mayúsculas directamente en el controlador
             'rol' => $request->rol,
             'semestre' => $request->semestre,
         ]);

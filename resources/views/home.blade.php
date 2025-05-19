@@ -6,7 +6,7 @@
 <div class="alert {{ Auth::user()->esAsesor() ? 'alert-primary' : (Auth::user()->esAdmin() ? 'alert-dark' : 'alert-success') }} mb-4 shadow-sm">
     <div class="d-flex align-items-center">
         <div class="flex-shrink-0">
-            <i class="fas {{ Auth::user()->esAsesor() ? 'fa-chalkboard-teacher' : 'fa-user-graduate' }} fa-3x me-3"></i>
+            <i class="fas {{ Auth::user()->esAsesor() ? 'fa-chalkboard-teacher' : (Auth::user()->esAdmin() ? 'fa-user-shield' : 'fa-user-graduate') }} fa-3x me-3"></i>
         </div>
         <div class="flex-grow-1">
             <h4 class="alert-heading">
@@ -19,15 +19,15 @@
                 @endif
             </h4>
             <p class="mb-0">
-        <strong>{{ Auth::user()->nombre }} {{ Auth::user()->apellido }}</strong>
-        @if(Auth::user()->esAsesor())
-            - Estás listo para compartir tu conocimiento y apoyar a otros estudiantes.
-        @elseif(Auth::user()->esAdmin())
-            - Tienes acceso completo al sistema para gestionar usuarios y configuraciones.
-        @else
-            - Explora todas las asesorías disponibles y encuentra el apoyo académico que necesitas.
-        @endif
-    </p>
+                <strong>{{ Auth::user()->nombre }} {{ Auth::user()->apellido }}</strong>
+                @if(Auth::user()->esAsesor())
+                    - Estás listo para compartir tu conocimiento y apoyar a otros estudiantes.
+                @elseif(Auth::user()->esAdmin())
+                    - Tienes acceso completo al sistema para gestionar usuarios y configuraciones.
+                @else
+                    - Explora todas las asesorías disponibles y encuentra el apoyo académico que necesitas.
+                @endif
+            </p>
         </div>
     </div>
 </div>
@@ -172,18 +172,18 @@
                 </div>
                 <div class="col-md-4">
                     <div class="text-center mb-3">
-                        <i class="fas fa-database fa-2x text-dark mb-2"></i>
-                        <h6>Reportes del Sistema</h6>
-                        <p class="small text-muted">Consulta estadísticas y reportes generales</p>
-                        <a href="/admin/reportes" class="btn btn-sm btn-outline-dark">Ver reportes</a>
+                        <i class="fas fa-file-alt fa-2x text-dark mb-2"></i>
+                        <h6>Gestión de Contenido</h6>
+                        <p class="small text-muted">Administra los materiales y recursos educativos</p>
+                        <a href="/admin/contenido" class="btn btn-sm btn-outline-dark">Gestionar contenido</a>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="text-center mb-3">
-                        <i class="fas fa-cogs fa-2x text-dark mb-2"></i>
-                        <h6>Configuraciones</h6>
-                        <p class="small text-muted">Ajustes generales de la plataforma</p>
-                        <a href="/admin/configuracion" class="btn btn-sm btn-outline-dark">Configurar</a>
+                        <i class="fas fa-envelope fa-2x text-dark mb-2"></i>
+                        <h6>Notificaciones</h6>
+                        <p class="small text-muted">Envía notificaciones a los usuarios</p>
+                        <a href="/admin/notificaciones" class="btn btn-sm btn-outline-dark">Gestionar notificaciones</a>
                     </div>
                 </div>
             </div>
