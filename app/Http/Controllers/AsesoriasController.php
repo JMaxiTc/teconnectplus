@@ -284,36 +284,52 @@ class AsesoriasController extends Controller
             abort(403);
         }
 
-        $request->validate([
-            'estado' => 'required|in:PENDIENTE,CONFIRMADA,PROCESO,FINALIZADA,CANCELADA',
-            'observaciones' => $request->estado === 'CANCELADA' ? 'required|string|min:10' : 'nullable',
-        ]);
+        try {
+            $request->validate([
+                'estado' => 'required|in:PENDIENTE,CONFIRMADA,PROCESO,FINALIZADA,CANCELADA',
+                'observaciones' => $request->estado === 'CANCELADA' ? 'required|string|min:10' : 'nullable',
+            ]);
 
-        $estado_anterior = $asesoria->estado;
-        $asesoria->estado = $request->estado;
-        
-        // Guardar observaciones cuando se cancela una asesoría
-        if ($request->estado === 'CANCELADA' && $request->has('observaciones')) {
-            $asesoria->observaciones = $request->observaciones;
-        }
-        
-        $asesoria->save();
+            $estado_anterior = $asesoria->estado;
+            $asesoria->estado = $request->estado;
+            
+            // Guardar observaciones cuando se cancela una asesoría
+            if ($request->estado === 'CANCELADA' && $request->has('observaciones')) {
+                $asesoria->observaciones = $request->observaciones;
+                \Illuminate\Support\Facades\Log::info("Cancelando asesoría ID: {$id} con observación: {$request->observaciones}");
+            }
+            
+            $result = $asesoria->save();
+            
+            if (!$result) {
+                \Illuminate\Support\Facades\Log::error("Error al guardar la asesoría ID: {$id}. No se pudo actualizar.");
+                session()->flash('tipo', 'error');
+                session()->flash('mensaje', 'No se pudo actualizar el estado de la asesoría. Por favor, inténtalo de nuevo.');
+                return back();
+            }
 
-        session()->flash('tipo', 'success');
-        session()->flash('mensaje', '¡Estado actualizado correctamente!');
+            \Illuminate\Support\Facades\Log::info("Asesoría ID: {$id} actualizada correctamente al estado: {$request->estado}");
+            session()->flash('tipo', 'success');
+            session()->flash('mensaje', '¡Estado actualizado correctamente!');
 
-        // Redireccionar según el estado anterior y el nuevo
-        if ($request->estado === 'CONFIRMADA') {
-            return redirect()->route('asesoriasa.activas.get');
-        } elseif ($request->estado === 'PROCESO') {
-            // Mantener al usuario en la vista de detalle al iniciar la asesoría
-            return redirect()->route('asesoriasa.detalle.get', $id);
-        } elseif (in_array($request->estado, ['FINALIZADA', 'CANCELADA'])) {
-            return redirect()->route('asesoriasa.historial.get');
-        } elseif ($estado_anterior === 'PENDIENTE') {
-            return redirect()->route('asesoriasa.solicitudes.get');
-        } else {
-            return redirect()->route('asesoriasa.activas.get');
+            // Redireccionar según el estado anterior y el nuevo
+            if ($request->estado === 'CONFIRMADA') {
+                return redirect()->route('asesoriasa.activas.get');
+            } elseif ($request->estado === 'PROCESO') {
+                // Mantener al usuario en la vista de detalle al iniciar la asesoría
+                return redirect()->route('asesoriasa.detalle.get', $id);
+            } elseif (in_array($request->estado, ['FINALIZADA', 'CANCELADA'])) {
+                return redirect()->route('asesoriasa.historial.get');
+            } elseif ($estado_anterior === 'PENDIENTE') {
+                return redirect()->route('asesoriasa.solicitudes.get');
+            } else {
+                return redirect()->route('asesoriasa.activas.get');
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error en actualizarEstado: {$e->getMessage()}");
+            session()->flash('tipo', 'error');
+            session()->flash('mensaje', 'Error al procesar la solicitud: ' . $e->getMessage());
+            return back();
         }
     }
 

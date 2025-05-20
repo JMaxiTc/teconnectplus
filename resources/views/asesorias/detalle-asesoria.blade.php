@@ -367,7 +367,7 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('asesoriasa.actualizar', $asesoria->id_asesoria) }}" method="POST">
+            <form id="formCancelarAsesoria" action="{{ route('asesoriasa.actualizar', $asesoria->id_asesoria) }}" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="alert alert-warning">
@@ -379,13 +379,13 @@
                     
                     <div class="mb-3">
                         <label for="observaciones" class="form-label">Motivo de la cancelación <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="observaciones" name="observaciones" rows="4" required></textarea>
-                        <div class="form-text">Por favor, sé claro y específico.</div>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="4" required minlength="10"></textarea>
+                        <div class="form-text">Por favor, sé claro y específico (mínimo 10 caracteres).</div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
-                    <button type="submit" class="btn btn-danger">
+                    <button type="submit" id="btnConfirmarCancelacion" class="btn btn-danger">
                         <i class="fas fa-times-circle me-2"></i>
                         Confirmar Cancelación
                     </button>
@@ -394,6 +394,33 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejar el envío del formulario de cancelación
+    const formCancelar = document.getElementById('formCancelarAsesoria');
+    if (formCancelar) {
+        formCancelar.addEventListener('submit', function(e) {
+            const observaciones = document.getElementById('observaciones').value.trim();
+            
+            if (observaciones.length < 10) {
+                e.preventDefault();
+                alert('Por favor, proporciona un motivo de cancelación con al menos 10 caracteres.');
+                return false;
+            }
+            
+            // Deshabilitar el botón de envío para prevenir múltiples clicks
+            const btnSubmit = document.getElementById('btnConfirmarCancelacion');
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Procesando...';
+            }
+            
+            return true;
+        });
+    }
+});
+</script>
 
 <style>
 /* Estilos para el mensaje de alerta de videoconferencia */
