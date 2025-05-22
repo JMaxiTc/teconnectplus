@@ -13,6 +13,79 @@
     <link href="{{ URL::asset('assets/style.css') }}" rel="stylesheet" />
     <link href="{{ URL::asset('assets/calificaciones.css') }}" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Estilos para el sistema de notificaciones */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 0.65rem;
+            padding: 0.25rem 0.4rem;
+            animation-duration: 0.5s;
+        }
+        
+        .notification-badge.pulse {
+            animation-name: notification-pulse;
+            animation-iteration-count: 3;
+        }
+        
+        @keyframes notification-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .notification-dropdown {
+            width: 320px;
+            max-width: 90vw;
+            border-radius: 0.5rem;
+        }
+        
+        .notification-item {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .notification-item:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+        
+        .notification-item.unread {
+            background-color: rgba(13, 110, 253, 0.08);
+            border-left: 3px solid #0d6efd;
+        }
+        
+        .notification-item.unread:hover {
+            background-color: rgba(13, 110, 253, 0.15);
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-item .icon-wrapper {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        /* Animación para nuevas notificaciones */
+        @keyframes highlight-new {
+            from { background-color: rgba(13, 110, 253, 0.2); }
+            to { background-color: rgba(13, 110, 253, 0.08); }
+        }
+        
+        .notification-item.new-notification {
+            animation: highlight-new 2s ease;
+        }
+    </style>
 </head>
 <body class="
     @guest
@@ -26,8 +99,7 @@
         
         <div class="flex-grow-1 main-content p-4">
             @yield('content') <!-- Aquí va el contenido de cada vista -->
-            @include('components.notificacion-modal')
-
+            @include('components.notificacion-toast')
         </div>
     </div>
 
@@ -36,6 +108,9 @@
     <!-- Actualización: Cargar Bootstrap Bundle que incluye Popper -->
     <script src="{{ URL::asset('bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ URL::asset('DataTables/datatables.min.js') }}"></script>
+    <script src="{{ URL::asset('js/interceptor.js') }}"></script>
+    <script src="{{ URL::asset('js/notificaciones.js') }}"></script>
+    <script src="{{ URL::asset('js/app.js') }}"></script>
     
     <!-- Scripts para control de roles -->
     <script>

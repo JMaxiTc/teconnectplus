@@ -118,6 +118,33 @@
                             });
                         </script>
                     @endif
+
+                                        <!-- Iconos de navegación extra (notificaciones y perfil) -->
+                    <li class="nav-item">
+                        <a class="nav-link position-relative mx-1" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                            <span id="notification-badge" class="badge rounded-pill bg-danger notification-badge" style="display: none;">0</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end p-0 notification-dropdown shadow" aria-labelledby="notificationsDropdown">
+                            <div class="notification-header d-flex justify-content-between align-items-center p-3 border-bottom">
+                                <h6 class="mb-0 fw-bold">Notificaciones</h6>
+                                <div>
+                                    <button class="btn btn-sm btn-link text-decoration-none" id="mark-all-read">Marcar todas como leídas</button>
+                                </div>
+                            </div>
+                            <div id="notifications-container" class="notification-body" style="max-height: 300px; overflow-y: auto;">
+                                <div class="text-center p-3 text-muted">
+                                    <div class="my-3">
+                                        <i class="bi bi-bell-slash" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                    <p>No tienes notificaciones</p>
+                                </div>
+                            </div>
+                            <div class="notification-footer text-center p-2 border-top">
+                                <a href="#" class="text-decoration-none small">Ver todas las notificaciones</a>
+                            </div>
+                        </ul>
+                    </li>
                     
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"

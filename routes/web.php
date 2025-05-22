@@ -34,6 +34,18 @@ Route::middleware('auth')->group(function () {
     // Ruta para guardar calificaciones
     Route::post('/calificaciones/guardar', [CalificacionesController::class, 'guardarCalificacion'])->name('calificaciones.guardar');
     
+    // Rutas de notificaciones
+    Route::get('/notificaciones', [App\Http\Controllers\NotificacionController::class, 'index'])->name('notificaciones.index');
+    Route::get('/notificaciones/conteo', [App\Http\Controllers\NotificacionController::class, 'conteo'])->name('notificaciones.conteo');
+    Route::post('/notificaciones/{id}/leer', [App\Http\Controllers\NotificacionController::class, 'marcarLeida'])->name('notificaciones.leer');
+    Route::post('/notificaciones/leer-todas', [App\Http\Controllers\NotificacionController::class, 'marcarTodasLeidas'])->name('notificaciones.leer-todas');
+    Route::delete('/notificaciones/{id}', [App\Http\Controllers\NotificacionController::class, 'eliminar'])->name('notificaciones.eliminar');
+    
+    // Ruta para crear notificaciones de prueba (solo en ambiente de desarrollo)
+    if (app()->environment('local')) {
+        Route::get('/notificaciones/test', [App\Http\Controllers\NotificacionesPruebaController::class, 'crearNotificacionesDePrueba'])->name('notificaciones.test');
+    }
+    
     // Ruta de depuración (solo en ambiente local)
     if (app()->environment('local')) {
         Route::get('/debug/crear-disponibilidades', [App\Http\Controllers\DebugController::class, 'crearDisponibilidadPrueba'])->name('debug.disponibilidades');
