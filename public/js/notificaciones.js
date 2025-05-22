@@ -19,13 +19,12 @@ class NotificationManager {
     
     /**
      * Inicializar el gestor de notificaciones
-     */
-    inicializar() {
+     */    inicializar() {
         // Cargar notificaciones al iniciar
         this.cargarNotificaciones();
         
-        // Actualizar cada minuto
-        setInterval(() => this.cargarNotificaciones(), 60000);
+        // Actualizar más frecuentemente (cada 10 segundos) para notificaciones en tiempo real
+        setInterval(() => this.cargarNotificaciones(), 10000);
         
         // Configurar eventos
         if (this.markAllReadBtn) {
@@ -43,19 +42,138 @@ class NotificationManager {
             });
         }
     }
-    
-    /**
+      /**
      * Cargar notificaciones desde el servidor
-     */
-    cargarNotificaciones() {
-        fetch('/notificaciones')
+     */    cargarNotificaciones() {
+        fetch('/notificaciones/recientes')
             .then(response => response.json())
             .then(data => {
+                // Verificar si hay nuevas notificaciones
+                const nuevasNotificaciones = this.verificarNuevasNotificaciones(data);
+                
+                // Actualizar la lista de notificaciones
                 this.notificaciones = data;
                 this.actualizarContador();
                 this.renderizarNotificaciones();
+                
+                // Mostrar toasts para nuevas notificaciones
+                if (nuevasNotificaciones.length > 0) {
+                    nuevasNotificaciones.forEach(notificacion => {
+                        this.mostrarToastNotificacion(notificacion);
+                    });
+                }
             })
             .catch(error => console.error('Error al cargar notificaciones:', error));
+    }
+    
+    /**
+     * Verificar si hay nuevas notificaciones comparando con el estado anterior
+     */
+    verificarNuevasNotificaciones(nuevasNotificaciones) {
+        if (!this.notificaciones.length) return [];
+        
+        // Encontrar notificaciones que no estaban en la lista anterior
+        const notificacionesIds = this.notificaciones.map(n => n.id_notificacion);
+        return nuevasNotificaciones.filter(n => !notificacionesIds.includes(n.id_notificacion));
+    }
+    
+    /**
+     * Mostrar una notificación toast
+     */
+    mostrarToastNotificacion(notificacion) {
+        // Crear el elemento toast
+        const toastEl = document.createElement('div');
+        toastEl.className = 'toast show';
+        toastEl.setAttribute('role', 'alert');
+        toastEl.setAttribute('aria-live', 'assertive');
+        toastEl.setAttribute('aria-atomic', 'true');
+          // Determinar el color e icono según el tipo o estado de la asesoría
+        let bgColor = 'bg-info';
+        let iconClass = 'bi-info-circle-fill';
+        
+        // Mapeo de íconos específicos según el tipo de notificación de asesoría
+        if (notificacion.titulo.includes('finalizada')) {
+            iconClass = 'bi-check-circle-fill';
+            bgColor = 'bg-info'; // Color cyan como en la imagen
+        } else if (notificacion.titulo.includes('iniciada') || notificacion.titulo.includes('en curso')) {
+            iconClass = 'bi-play-circle-fill';
+            bgColor = 'bg-info'; // Color cyan
+        } else {
+            switch (notificacion.tipo) {
+                case 'success':
+                    bgColor = 'bg-success';
+                    iconClass = 'bi-check-circle-fill';
+                    break;
+                case 'error':
+                    bgColor = 'bg-danger';
+                    iconClass = 'bi-x-circle-fill';
+                    break;
+                case 'warning':
+                    bgColor = 'bg-warning';
+                    iconClass = 'bi-exclamation-circle-fill';
+                    break;
+            }
+        }
+        
+        // Usar icono personalizado si existe
+        if (notificacion.icono) {
+            // Convertir íconos de Font Awesome a Bootstrap Icons
+            if (notificacion.icono === 'fa-check-circle') {
+                iconClass = 'bi-check-circle-fill';
+            } else if (notificacion.icono === 'fa-times-circle') {
+                iconClass = 'bi-x-circle-fill';
+            } else if (notificacion.icono === 'fa-play-circle') {
+                iconClass = 'bi-play-circle-fill';
+            } else if (notificacion.icono === 'fa-check-double') {
+                iconClass = 'bi-check2-all';
+            } else if (notificacion.icono === 'fa-calendar-plus') {
+                iconClass = 'bi-calendar-plus-fill';
+            } else {
+                iconClass = 'bi-' + notificacion.icono.replace('fa-', '');
+            }
+        }
+          // Construir el HTML del toast
+        toastEl.innerHTML = `
+            <div class="toast-header bg-white">
+                <div class="${bgColor} rounded-circle p-2 d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                    <i class="bi ${iconClass} text-white"></i>
+                </div>
+                <strong class="me-auto">${notificacion.titulo}</strong>
+                <small class="text-muted">${this.formatearFecha(notificacion.created_at)}</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${notificacion.mensaje}
+            </div>
+        `;
+        
+        // Agregar el toast al contenedor
+        const toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            // Crear el contenedor si no existe
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+            container.style.zIndex = '1080';
+            document.body.appendChild(container);
+            container.appendChild(toastEl);
+        } else {
+            toastContainer.appendChild(toastEl);
+        }
+        
+        // Configurar temporizador para eliminar el toast
+        setTimeout(() => {
+            toastEl.classList.remove('show');
+            setTimeout(() => toastEl.remove(), 500);
+        }, 5000);
+    }
+    
+    /**
+     * Formatear fecha para mostrar en notificaciones
+     */
+    formatearFecha(fechaStr) {
+        const fecha = new Date(fechaStr);
+        return fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
     
     /**
@@ -109,27 +227,58 @@ class NotificationManager {
             const item = document.createElement('div');
             item.className = `notification-item position-relative ${notificacion.leida ? '' : 'unread'}`;
             item.dataset.id = notificacion.id;
-            
-            // Determinar icono según el tipo
+              // Determinar icono y color según el tipo o estado de la asesoría
             let icon = 'bi-info-circle';
-            switch (notificacion.tipo) {
-                case 'success':
-                    icon = 'bi-check-circle';
-                    break;
-                case 'warning':
-                    icon = 'bi-exclamation-triangle';
-                    break;
-                case 'error':
-                    icon = 'bi-x-circle';
-                    break;
-                case 'info':
-                default:
-                    icon = 'bi-info-circle';
+            let bgColor = 'bg-info';
+            let iconColor = 'text-white';
+            
+            // Mapeo de íconos específicos según el tipo de notificación de asesoría
+            if (notificacion.titulo.includes('finalizada')) {
+                icon = 'bi-check-circle';
+                bgColor = 'bg-info'; // Color cyan como en la imagen
+                iconColor = 'text-white';
+            } else if (notificacion.titulo.includes('iniciada') || notificacion.titulo.includes('en curso')) {
+                icon = 'bi-play-circle';
+                bgColor = 'bg-info'; // Color cyan
+                iconColor = 'text-white';
+            } else {
+                // Iconos por defecto según tipo
+                switch (notificacion.tipo) {
+                    case 'success':
+                        icon = 'bi-check-circle';
+                        bgColor = 'bg-success';
+                        break;
+                    case 'warning':
+                        icon = 'bi-exclamation-triangle';
+                        bgColor = 'bg-warning';
+                        break;
+                    case 'error':
+                        icon = 'bi-x-circle';
+                        bgColor = 'bg-danger';
+                        break;
+                    case 'info':
+                    default:
+                        icon = 'bi-info-circle';
+                        bgColor = 'bg-info';
+                }
             }
             
             // Usar icono personalizado si existe
             if (notificacion.icono) {
-                icon = notificacion.icono;
+                // Convertir íconos de Font Awesome a Bootstrap Icons
+                if (notificacion.icono === 'fa-check-circle') {
+                    icon = 'bi-check-circle-fill';
+                } else if (notificacion.icono === 'fa-times-circle') {
+                    icon = 'bi-x-circle-fill';
+                } else if (notificacion.icono === 'fa-play-circle') {
+                    icon = 'bi-play-circle-fill';
+                } else if (notificacion.icono === 'fa-check-double') {
+                    icon = 'bi-check2-all';
+                } else if (notificacion.icono === 'fa-calendar-plus') {
+                    icon = 'bi-calendar-plus-fill';
+                } else {
+                    icon = notificacion.icono.replace('fa-', 'bi-');
+                }
             }
             
             // Formatear fecha
@@ -140,12 +289,11 @@ class NotificationManager {
                 hour: '2-digit', 
                 minute: '2-digit' 
             });
-            
-            item.innerHTML = `
+              item.innerHTML = `
                 <div class="d-flex">
                     <div class="me-3">
-                        <div class="bg-light rounded-circle p-2">
-                            <i class="bi ${icon} text-${notificacion.tipo}"></i>
+                        <div class="${bgColor} rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; flex-shrink: 0;">
+                            <i class="bi ${icon} ${iconColor}" style="font-size: 1.2rem;"></i>
                         </div>
                     </div>
                     <div class="flex-grow-1">

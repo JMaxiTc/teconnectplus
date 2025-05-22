@@ -8,6 +8,7 @@ use App\Models\Materia;
 use App\Models\DisponibilidadAsesor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\NotificacionController;
 
 class AsesoriasController extends Controller
 {    
@@ -225,7 +226,7 @@ class AsesoriasController extends Controller
         $minutos = $request->duracion % 60;
         $duracionFormatted = sprintf('%02d:%02d:00', $horas, $minutos);
         
-        Asesoria::create([
+        $asesoria = Asesoria::create([
             'tema' => $request->tema,
             'fecha' => $request->fecha . ' ' . $request->hora,
             'duracion' => $duracionFormatted,
@@ -234,6 +235,22 @@ class AsesoriasController extends Controller
             'fk_id_estudiante' => Auth::user()->id_usuario,
             'estado' => 'PENDIENTE',
         ]);
+        
+        // Crear notificación para el asesor sobre la nueva solicitud
+        $estudiante = Auth::user();
+        $materia = Materia::find($request->materia);
+        $fechaFormateada = date('d/m/Y', strtotime($request->fecha));
+        $horaFormateada = date('H:i', strtotime($request->hora));
+        
+        NotificacionController::crearNotificacion(
+            $request->asesor, // ID del asesor
+            "Nueva solicitud de asesoría",
+            "El estudiante {$estudiante->nombre} {$estudiante->apellido} ha solicitado una asesoría de {$materia->nombre} para el {$fechaFormateada} a las {$horaFormateada}. Tema: {$request->tema}",
+            'info',
+            'fa-calendar-plus',
+            route('asesoriasa.detalle.get', $asesoria->id_asesoria)
+        );
+        
         session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
         session()->flash('mensaje', '¡Asesoria solicitada correctamente!'); // Mensaje a mostrar
         return redirect('/asesorias/pendientes');
@@ -311,6 +328,58 @@ class AsesoriasController extends Controller
             \Illuminate\Support\Facades\Log::info("Asesoría ID: {$id} actualizada correctamente al estado: {$request->estado}");
             session()->flash('tipo', 'success');
             session()->flash('mensaje', '¡Estado actualizado correctamente!');
+            
+            // Crear notificación para el estudiante
+            $estudiante = $asesoria->estudiante;
+            $asesor = $asesoria->asesor;
+            $materia = $asesoria->materia;
+            
+            // Determinar mensaje y tipo según el estado
+            $mensaje = '';
+            $titulo = '';
+            $tipo = 'info';
+            $icono = null;
+            
+            switch ($request->estado) {
+                case 'CONFIRMADA':
+                    $titulo = "Asesoría confirmada";
+                    $mensaje = "Tu asesoría de {$materia->nombre} con {$asesor->nombre} {$asesor->apellido} ha sido confirmada para el " . 
+                              date('d/m/Y', strtotime($asesoria->fecha)) . " a las " . 
+                              date('H:i', strtotime($asesoria->fecha)) . ".";
+                    $tipo = 'success';
+                    $icono = 'fa-check-circle';
+                    break;
+                case 'CANCELADA':
+                    $titulo = "Asesoría cancelada";
+                    $mensaje = "Tu asesoría de {$materia->nombre} con {$asesor->nombre} {$asesor->apellido} ha sido cancelada. Motivo: {$asesoria->observaciones}";
+                    $tipo = 'error';
+                    $icono = 'fa-times-circle';
+                    break;
+                case 'PROCESO':
+                    $titulo = "Asesoría en curso";
+                    $mensaje = "Tu asesoría de {$materia->nombre} con {$asesor->nombre} {$asesor->apellido} ha iniciado.";
+                    $tipo = 'info';
+                    $icono = 'fa-play-circle';
+                    break;
+                case 'FINALIZADA':
+                    $titulo = "Asesoría finalizada";
+                    $mensaje = "Tu asesoría de {$materia->nombre} con {$asesor->nombre} {$asesor->apellido} ha finalizado.";
+                    $tipo = 'info';
+                    $icono = 'fa-check-double';
+                    break;
+            }
+            
+            // Solo crear notificación si hay cambio de estado relevante
+            if (!empty($mensaje)) {
+                NotificacionController::crearNotificacion(
+                    $estudiante->id_usuario,
+                    $titulo,
+                    $mensaje,
+                    $tipo,
+                    $icono,
+                    route('asesorias.detalle.get', $id)
+                );
+            }
 
             // Redireccionar según el estado anterior y el nuevo
             if ($request->estado === 'CONFIRMADA') {

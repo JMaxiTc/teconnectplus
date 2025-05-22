@@ -102,6 +102,9 @@
             @include('components.notificacion-toast')
         </div>
     </div>
+    
+    <!-- Contenedor para toasts de notificaciones en tiempo real -->
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;"></div>
 
     <!-- Cargar JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

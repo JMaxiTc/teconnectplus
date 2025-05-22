@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     
     // Rutas de notificaciones
     Route::get('/notificaciones', [App\Http\Controllers\NotificacionController::class, 'index'])->name('notificaciones.index');
+    Route::get('/notificaciones/recientes', [App\Http\Controllers\NotificacionController::class, 'recientes'])->name('notificaciones.recientes');
     Route::get('/notificaciones/conteo', [App\Http\Controllers\NotificacionController::class, 'conteo'])->name('notificaciones.conteo');
     Route::post('/notificaciones/{id}/leer', [App\Http\Controllers\NotificacionController::class, 'marcarLeida'])->name('notificaciones.leer');
     Route::post('/notificaciones/leer-todas', [App\Http\Controllers\NotificacionController::class, 'marcarTodasLeidas'])->name('notificaciones.leer-todas');
@@ -44,6 +45,10 @@ Route::middleware('auth')->group(function () {
     // Ruta para crear notificaciones de prueba (solo en ambiente de desarrollo)
     if (app()->environment('local')) {
         Route::get('/notificaciones/test', [App\Http\Controllers\NotificacionesPruebaController::class, 'crearNotificacionesDePrueba'])->name('notificaciones.test');
+        
+        // Rutas para pruebas de notificaciones en tiempo real
+        Route::get('/pruebas/notificaciones', [App\Http\Controllers\PruebasRealTimeController::class, 'vistaTest'])->name('pruebas.notificaciones');
+        Route::post('/pruebas/notificacion-instantanea', [App\Http\Controllers\PruebasRealTimeController::class, 'enviarNotificacionInstantanea'])->name('pruebas.notificacion-instantanea');
     }
     
     // Ruta de depuración (solo en ambiente local)

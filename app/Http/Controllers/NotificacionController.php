@@ -22,6 +22,21 @@ class NotificacionController extends Controller
     }
     
     /**
+     * Obtener solo las notificaciones recientes del usuario (últimas 24 horas).
+     */
+    public function recientes()
+    {
+        $ultimasHoras = now()->subHours(24);
+        
+        $notificaciones = Notificacion::where('id_usuario', Auth::user()->id_usuario)
+            ->where('created_at', '>=', $ultimasHoras)
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return response()->json($notificaciones);
+    }
+    
+    /**
      * Obtener el conteo de notificaciones no leídas.
      */
     public function conteo()
