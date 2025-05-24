@@ -8,6 +8,8 @@ use App\Models\Asesoria;
 use App\Models\Materia;
 use App\Models\Recurso;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminController extends Controller
 {
@@ -63,6 +65,7 @@ class AdminController extends Controller
             'semestre' => $request->semestre,
             'correo' => $request->correo,
             'password' => Hash::make($request->password),
+            'fecha_creacion' => now(),
         ]);
         session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
         session()->flash('mensaje', '¡Usuario agregado correctamente!');
@@ -143,5 +146,287 @@ class AdminController extends Controller
         // Notificacion::create([...]);
 
         return redirect()->route('admin.notificaciones')->with('success', 'Notificación enviada correctamente.');
+    }
+
+    /**
+     * Mostrar la página principal de reportes con estadísticas generales
+     */
+    public function reportesIndex()
+    {
+        // Estadísticas generales del sistema
+        $totalUsuarios = Usuario::count();
+        $totalAsesorias = Asesoria::count();
+        $totalMaterias = Materia::count();
+        
+        $totalEstudiantes = Usuario::where('rol', 'ESTUDIANTE')->count();
+        $totalAsesores = Usuario::where('rol', 'ASESOR')->count();
+        $totalAdmins = Usuario::where('rol', 'ADMIN')->count();
+        
+        $asesoriasFinalizadas = Asesoria::where('estado', 'FINALIZADA')->count();
+        $asesoriasPendientes = Asesoria::where('estado', 'PENDIENTE')->count();
+        $asesoriasActivas = Asesoria::whereIn('estado', ['CONFIRMADA', 'PROCESO'])->count();
+        $asesoriasCanceladas = Asesoria::where('estado', 'CANCELADA')->count();
+        
+        // Obtener datos reales por mes para gráficos
+        $asesoriasPorMes = [];
+        $usuariosPorMes = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $asesoriasPorMes[] = Asesoria::whereMonth('fecha', $i)->count();
+            $usuariosPorMes[] = Usuario::whereMonth('fecha_creacion', $i)->count();
+        }
+        
+        // Estadísticas de usuarios con asesorías
+        $asesoriasPorUsuario = Usuario::join('asesoria', 'usuario.id_usuario', '=', 'asesoria.fk_id_asesor')
+            ->leftJoin('calificacion', 'asesoria.fk_id_calificacion', '=', 'calificacion.id_calificacion')
+            ->select(
+                'usuario.nombre',
+                'usuario.rol as tipo',
+                \DB::raw('count(asesoria.id_asesoria) as total_asesorias'),
+                \DB::raw('COALESCE(AVG(calificacion.puntuacion), 0) as promedio_calificacion')
+            )
+            ->groupBy('usuario.id_usuario', 'usuario.nombre', 'usuario.rol')
+            ->orderBy('total_asesorias', 'desc')
+            ->limit(10)
+            ->get();
+        
+        // Estadísticas de materias con asesorías
+        $asesoriasPorMateria = Materia::join('asesoria', 'materia.id_materia', '=', 'asesoria.fk_id_materia')
+            ->leftJoin('calificacion', 'asesoria.fk_id_calificacion', '=', 'calificacion.id_calificacion')
+            ->select(
+                'materia.nombre',
+                \DB::raw('count(asesoria.id_asesoria) as total_asesorias'),
+                \DB::raw('COALESCE(AVG(calificacion.puntuacion), 0) as promedio_calificacion')
+            )
+            ->groupBy('materia.id_materia', 'materia.nombre')
+            ->orderBy('total_asesorias', 'desc')
+            ->limit(10)
+            ->get();
+        
+        // Meses para gráficos
+        $meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        
+        return view('admin.reportes.index', [
+            'totalUsuarios' => $totalUsuarios,
+            'totalAsesorias' => $totalAsesorias,
+            'totalMaterias' => $totalMaterias,
+            'totalEstudiantes' => $totalEstudiantes,
+            'totalAsesores' => $totalAsesores,
+            'totalAdmins' => $totalAdmins,
+            'asesoriasFinalizadas' => $asesoriasFinalizadas,
+            'asesoriasPendientes' => $asesoriasPendientes,
+            'asesoriasActivas' => $asesoriasActivas,
+            'asesoriasCanceladas' => $asesoriasCanceladas,
+            'meses' => $meses,
+            'asesoriasPorMes' => $asesoriasPorMes,
+            'usuariosPorMes' => $usuariosPorMes,
+            'asesoriasPorUsuario' => $asesoriasPorUsuario,
+            'asesoriasPorMateria' => $asesoriasPorMateria,
+            'breadcrumbs' => [
+                'Inicio' => url('/'),
+                'Reportes' => url('/admin/reportes')
+            ]
+        ]);
+    }
+
+    /**
+     * Mostrar reporte detallado de usuarios
+     */
+    public function reporteUsuarios()
+    {
+        // Estadísticas de usuarios
+        $usuarios = Usuario::all();
+        $estudiantesPorSemestre = Usuario::where('rol', 'ESTUDIANTE')
+            ->select('semestre', \DB::raw('count(*) as total'))
+            ->groupBy('semestre')
+            ->orderBy('semestre')
+            ->get();
+        
+        // Para gráfico de crecimiento mensual (datos reales basados en fecha_creacion)
+        $usuariosPorMes = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $usuariosPorMes[] = Usuario::whereMonth('fecha_creacion', $i)->count();
+        }
+        
+        return view('admin.reportes.usuarios', [
+            'usuarios' => $usuarios,
+            'estudiantesPorSemestre' => $estudiantesPorSemestre,
+            'usuariosPorMes' => $usuariosPorMes,
+            'breadcrumbs' => [
+                'Inicio' => url('/'),
+                'Reportes' => url('/admin/reportes'),
+                'Usuarios' => url('/admin/reportes/usuarios')
+            ]
+        ]);
+    }
+
+    /**
+     * Mostrar reporte detallado de asesorías
+     */
+    public function reporteAsesorias()
+    {
+        // Estadísticas de asesorías
+        $asesorias = Asesoria::with(['estudiante', 'asesor', 'materia'])->get();
+        
+        // Agrupamiento por estado
+        $asesoriasPorEstado = Asesoria::select('estado', \DB::raw('count(*) as total'))
+            ->groupBy('estado')
+            ->get();
+        
+        // Agrupamiento por mes (datos reales)
+        $asesoriasPorMes = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $asesoriasPorMes[] = Asesoria::whereMonth('fecha', $i)->count();
+        }
+        
+        // Agrupamiento por materias más solicitadas
+        $materiasMasSolicitadas = Asesoria::join('materia', 'asesoria.fk_id_materia', '=', 'materia.id_materia')
+            ->select('materia.nombre', \DB::raw('count(*) as total'))
+            ->groupBy('materia.nombre')
+            ->orderBy('total', 'desc')
+            ->take(10)
+            ->get();
+        
+        return view('admin.reportes.asesorias', [
+            'asesorias' => $asesorias,
+            'asesoriasPorEstado' => $asesoriasPorEstado,
+            'asesoriasPorMes' => $asesoriasPorMes,
+            'materiasMasSolicitadas' => $materiasMasSolicitadas,
+            'breadcrumbs' => [
+                'Inicio' => url('/'),
+                'Reportes' => url('/admin/reportes'),
+                'Asesorías' => url('/admin/reportes/asesorias')
+            ]
+        ]);
+    }
+
+    /**
+     * Mostrar reporte detallado de materias
+     */
+    public function reporteMaterias()
+    {
+        // Estadísticas de materias
+        $materias = Materia::all();
+        
+        // Materias con más asesorías
+        $materiasConMasAsesorias = Materia::join('asesoria', 'materia.id_materia', '=', 'asesoria.fk_id_materia')
+            ->select('materia.nombre', \DB::raw('count(*) as total_asesorias'))
+            ->groupBy('materia.nombre')
+            ->orderBy('total_asesorias', 'desc')
+            ->get();
+        
+        // Materias con más asesores asignados
+        $materiasConMasAsesores = Materia::join('asesor_materia', 'materia.id_materia', '=', 'asesor_materia.fk_id_materia')
+            ->select('materia.nombre', \DB::raw('count(*) as total_asesores'))
+            ->groupBy('materia.nombre')
+            ->orderBy('total_asesores', 'desc')
+            ->get();
+        
+        return view('admin.reportes.materias', [
+            'materias' => $materias,
+            'materiasConMasAsesorias' => $materiasConMasAsesorias,
+            'materiasConMasAsesores' => $materiasConMasAsesores,
+            'breadcrumbs' => [
+                'Inicio' => url('/'),
+                'Reportes' => url('/admin/reportes'),
+                'Materias' => url('/admin/reportes/materias')
+            ]
+        ]);
+    }
+
+    /**
+     * Generar PDF de reportes
+     */
+    public function generarPDF($tipo)
+    {
+        switch ($tipo) {
+            case 'usuarios':
+                // Datos para el reporte de usuarios
+                $estudiantesPorSemestre = Usuario::where('rol', 'ESTUDIANTE')
+                    ->select('semestre', \DB::raw('count(*) as total'))
+                    ->groupBy('semestre')
+                    ->orderBy('semestre')
+                    ->get();
+                
+                $usuariosPorMes = [];
+                for ($i = 1; $i <= 12; $i++) {
+                    $usuariosPorMes[] = Usuario::whereMonth('fecha_creacion', $i)->count();
+                }
+                
+                $data = [
+                    'titulo' => 'Reporte de Usuarios',
+                    'fecha' => date('Y-m-d'),
+                    'usuarios' => Usuario::all(),
+                    'totalUsuarios' => Usuario::count(),
+                    'totalEstudiantes' => Usuario::where('rol', 'ESTUDIANTE')->count(),
+                    'totalAsesores' => Usuario::where('rol', 'ASESOR')->count(),
+                    'estudiantesPorSemestre' => $estudiantesPorSemestre,
+                    'usuariosPorMes' => $usuariosPorMes,
+                    'meses' => ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+                ];
+                $view = 'admin.reportes.pdf.usuarios';
+                break;
+                
+            case 'asesorias':
+                // Datos para el reporte de asesorías
+                $asesoriasPorMes = [];
+                for ($i = 1; $i <= 12; $i++) {
+                    $asesoriasPorMes[] = Asesoria::whereMonth('fecha', $i)->count();
+                }
+                
+                $materiasMasSolicitadas = Asesoria::join('materia', 'asesoria.fk_id_materia', '=', 'materia.id_materia')
+                    ->select('materia.nombre', \DB::raw('count(*) as total'))
+                    ->groupBy('materia.nombre')
+                    ->orderBy('total', 'desc')
+                    ->take(10)
+                    ->get();
+                
+                $data = [
+                    'titulo' => 'Reporte de Asesorías',
+                    'fecha' => date('Y-m-d'),
+                    'asesorias' => Asesoria::with(['estudiante', 'asesor', 'materia'])->get(),
+                    'totalAsesorias' => Asesoria::count(),
+                    'finalizadas' => Asesoria::where('estado', 'FINALIZADA')->count(),
+                    'pendientes' => Asesoria::where('estado', 'PENDIENTE')->count(),
+                    'asesoriasPorMes' => $asesoriasPorMes,
+                    'materiasMasSolicitadas' => $materiasMasSolicitadas,
+                    'meses' => ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+                ];
+                $view = 'admin.reportes.pdf.asesorias';
+                break;
+                
+            case 'materias':
+                // Datos para el reporte de materias
+                $materiasConMasAsesorias = Materia::join('asesoria', 'materia.id_materia', '=', 'asesoria.fk_id_materia')
+                    ->select('materia.nombre', \DB::raw('count(*) as total_asesorias'))
+                    ->groupBy('materia.nombre')
+                    ->orderBy('total_asesorias', 'desc')
+                    ->get();
+                
+                $materiasConMasAsesores = Materia::join('asesor_materia', 'materia.id_materia', '=', 'asesor_materia.fk_id_materia')
+                    ->select('materia.nombre', \DB::raw('count(*) as total_asesores'))
+                    ->groupBy('materia.nombre')
+                    ->orderBy('total_asesores', 'desc')
+                    ->get();
+                
+                $data = [
+                    'titulo' => 'Reporte de Materias',
+                    'fecha' => date('Y-m-d'),
+                    'materias' => Materia::all(),
+                    'totalMaterias' => Materia::count(),
+                    'materiasConMasAsesorias' => $materiasConMasAsesorias,
+                    'materiasConMasAsesores' => $materiasConMasAsesores
+                ];
+                $view = 'admin.reportes.pdf.materias';
+                break;
+                
+            default:
+                return redirect()->back()->with('error', 'Tipo de reporte no válido');
+        }
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView($view, $data);
+        return $pdf->download("reporte-$tipo-" . date('Y-m-d') . ".pdf");
     }
 }

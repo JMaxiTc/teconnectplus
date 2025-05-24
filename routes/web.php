@@ -81,6 +81,15 @@ Route::middleware(['auth', 'can:ADMIN'])->group(function () {
     Route::post('/admin/usuarios/{id_usuario}/actualizar', [AdminController::class, 'usuariosActualizarPost']);
     Route::get('/admin/notificaciones', [AdminController::class, 'notificaciones'])->name('admin.notificaciones');
     Route::post('/admin/notificaciones', [AdminController::class, 'enviarNotificacion'])->name('admin.notificaciones.post');
+    
+    // Reportes del sistema
+    Route::get('/admin/reportes', [AdminController::class, 'reportesIndex'])->name('admin.reportes');
+    Route::get('/admin/reportes/usuarios', [AdminController::class, 'reporteUsuarios'])->name('admin.reportes.usuarios');
+    Route::get('/admin/reportes/asesorias', [AdminController::class, 'reporteAsesorias'])->name('admin.reportes.asesorias');
+    Route::get('/admin/reportes/materias', [AdminController::class, 'reporteMaterias'])->name('admin.reportes.materias');
+    
+    // Exportar reportes PDF
+    Route::get('/admin/reportes/pdf/{tipo}', [AdminController::class, 'generarPDF'])->name('admin.reportes.pdf');
 });
 
 // Estudiante

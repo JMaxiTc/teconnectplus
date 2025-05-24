@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Facade;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,5 +34,10 @@ class AppServiceProvider extends ServiceProvider
             return $user->rol === 'ASESOR' || $user->rol === 'ADMIN';  // Compara el campo 'rol' de la tabla 'usuarios'
         });
         
+        // Register facade aliases for PDF
+        Facade::clearResolvedInstance('PDF');
+        $this->app->bind('PDF', function ($app) {
+            return new \Barryvdh\DomPDF\PDF($app);
+        });
     }
 }

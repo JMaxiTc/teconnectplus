@@ -14,6 +14,8 @@
     <link href="{{ URL::asset('assets/calificaciones.css') }}" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     
+    @yield('styles')
+    
     <style>
         /* Estilos para el sistema de notificaciones */
         .notification-badge {
@@ -149,5 +151,7 @@
             });
         });
     </script>
+    
+    @yield('scripts')
 </body>
 </html>

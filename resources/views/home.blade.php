@@ -172,10 +172,10 @@
                 </div>
                 <div class="col-md-4">
                     <div class="text-center mb-3">
-                        <i class="fas fa-file-alt fa-2x text-dark mb-2"></i>
-                        <h6>Gestión de Contenido</h6>
-                        <p class="small text-muted">Administra los materiales y recursos educativos</p>
-                        <a href="/admin/contenido" class="btn btn-sm btn-outline-dark">Gestionar contenido</a>
+                        <i class="fas fa-chart-pie fa-2x text-dark mb-2"></i>
+                        <h6>Reportes</h6>
+                        <p class="small text-muted">Visualiza estadísticas y genera reportes del sistema</p>
+                        <a href="/admin/reportes" class="btn btn-sm btn-outline-dark">Ver reportes</a>
                     </div>
                 </div>
                 <div class="col-md-4">

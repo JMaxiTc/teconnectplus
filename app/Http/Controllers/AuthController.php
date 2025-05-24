@@ -112,6 +112,7 @@ class AuthController extends Controller
             'carrera' => strtoupper($request->carrera), // Convertir a mayúsculas directamente en el controlador
             'rol' => $request->rol,
             'semestre' => $request->semestre,
+            'fecha_creacion' => now(), // Agregamos la fecha actual para el registro
         ]);
 
         Auth::login($usuario);
