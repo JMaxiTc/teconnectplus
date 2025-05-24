@@ -10,7 +10,6 @@ use App\Models\Recurso;
 
 class CatalogosController extends Controller
 {
-
     public function index()
     {
         $materias = Materia::all(); // o paginadas si deseas
@@ -97,89 +96,118 @@ class CatalogosController extends Controller
     }
 
     public function materialesGet($idMateria)
-{
-    $materia = Materia::findOrFail($idMateria); // Obtener la materia por ID
-    $materiales = Recurso::where('fk_id_materia', $idMateria)->get(); // Obtener los materiales relacionados
+    {
+        $materia = Materia::findOrFail($idMateria); // Obtener la materia por ID
+        $materiales = Recurso::where('fk_id_materia', $idMateria)->get(); // Obtener los materiales relacionados
 
-    return view('catalogos.materialesGet', [ // Cambiar a la vista correcta
-        "materia" => $materia,
-        "materiales" => $materiales,
-        "breadcrumbs" => [
-            "Inicio" => url("/"),
-            "Materias" => url("/catalogos/materias"),
-            "Materiales" => url("/catalogos/materias/{$idMateria}/materiales")
-        ]
-    ]);
+        return view('catalogos.materialesGet', [ // Cambiar a la vista correcta
+            "materia" => $materia,
+            "materiales" => $materiales,
+            "breadcrumbs" => [
+                "Inicio" => url("/"),
+                "Materias" => url("/catalogos/materias"),
+                "Materiales" => url("/catalogos/materias/{$idMateria}/materiales")
+            ]
+        ]);
     }
 
     public function guardar(Request $request)
-{
-    $request->validate([
-        'nombre' => 'required|string|max:255',
-        'tipo' => 'required|string|in:documento,video,enlace',
-        'archivo' => 'nullable|file|max:10240', // 10MB
-        'url' => 'nullable|url',
-        'id_materia' => 'required|exists:materia,id_materia',
-    ]);
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'tipo' => 'required|string|in:documento,video,enlace',
+            'archivo' => 'nullable|file|max:10240', // 10MB
+            'url' => 'nullable|url',
+            'id_materia' => 'required|exists:materia,id_materia',
+        ]);
 
-    $recurso = new Recurso();
-    $recurso->nombre = $request->nombre;
-    $recurso->tipo = $request->tipo;
-    $recurso->fechaSubida = now();
+        $recurso = new Recurso();
+        $recurso->nombre = $request->nombre;
+        $recurso->tipo = $request->tipo;
+        $recurso->fechaSubida = now();
 
-    if ($request->tipo === 'enlace') {
-        $recurso->url = $request->url;
-        $recurso->tamaño = 0;
-    } else {
-        $archivo = $request->file('archivo');
-        $ruta = $archivo->store('materiales', 'public');
-        $recurso->url = 'storage/' . $ruta;
-        $recurso->tamaño = $archivo->getSize();
+        if ($request->tipo === 'enlace') {
+            $recurso->url = $request->url;
+            $recurso->tamaño = 0;
+        } else {
+            $archivo = $request->file('archivo');
+            $ruta = $archivo->store('materiales', 'public');
+            $recurso->url = 'storage/' . $ruta;
+            $recurso->tamaño = $archivo->getSize();
+        }
+
+        $recurso->fk_id_materia = $request->id_materia;
+        $recurso->save();
+
+        session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
+        session()->flash('mensaje', '¡Material agregado correctamente!');
+        return redirect()->back();
     }
 
-    $recurso->fk_id_materia = $request->id_materia;
-    $recurso->save();
+    public function materialesTodosGet(Request $request)
+    {
+        $query = Recurso::with('materia');
 
-    session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
-    session()->flash('mensaje', '¡Material agregado correctamente!');
-    return redirect()->back();
-}
+        if ($request->filled('materia')) {
+            $query->where('fk_id_materia', $request->materia);
+        }
 
-public function materialesTodosGet(Request $request)
-{
-    $query = Recurso::with('materia');
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
 
-    if ($request->filled('materia')) {
-        $query->where('fk_id_materia', $request->materia);
+        if ($request->filled('busqueda')) {
+            $query->where('nombre', 'like', '%' . $request->busqueda . '%');
+        }
+
+        // Ordenar por 'fechaSubida' o cualquier otra columna que prefieras
+        $materiales = $query->orderBy('fechaSubida', 'desc')->paginate(9);
+
+        // Obtener las materias para los filtros
+        $materias = Materia::orderBy('nombre')->get();
+
+        return view('catalogos.materialesAll', [ // Cambiar a la vista correcta
+            "materias" => $materias,
+            "materiales" => $materiales,
+            "query" => $query,
+            "breadcrumbs" => [
+                "Inicio" => url("/"),
+                "Materiales" => url("/catalogos/materiales")
+            ]
+        ]);
     }
 
-    if ($request->filled('tipo')) {
-        $query->where('tipo', $request->tipo);
+    /**
+     * Elimina un material (recurso) del sistema
+     * 
+     * @param int $id El ID del recurso a eliminar
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function eliminarMaterial($id)
+    {
+        // Verificar que el usuario sea administrador
+        if (auth()->user()->rol !== 'ADMIN') {
+            session()->flash('tipo', 'error');
+            session()->flash('mensaje', 'No tienes permisos para realizar esta acción.');
+            return redirect()->back();
+        }
+
+        // Buscar el recurso
+        $recurso = Recurso::findOrFail($id);
+        
+        // Si el recurso es un archivo (no un enlace), eliminar el archivo físico
+        if ($recurso->tipo !== 'enlace' && file_exists(public_path($recurso->url))) {
+            unlink(public_path($recurso->url));
+        }
+        
+        // Eliminar el registro
+        $recurso->delete();
+        
+        // Mensaje de éxito
+        session()->flash('tipo', 'success');
+        session()->flash('mensaje', '¡Material eliminado correctamente!');
+        
+        // Redirigir a la página de materiales
+        return redirect()->back();
     }
-
-    if ($request->filled('busqueda')) {
-        $query->where('nombre', 'like', '%' . $request->busqueda . '%');
-    }
-
-    // Ordenar por 'fechaSubida' o cualquier otra columna que prefieras
-    $materiales = $query->orderBy('fechaSubida', 'desc')->paginate(9);
-
-    // Obtener las materias para los filtros
-    $materias = Materia::orderBy('nombre')->get();
-
-    return view('catalogos.materialesAll', [ // Cambiar a la vista correcta
-        "materias" => $materias,
-        "materiales" => $materiales,
-        "query" => $query,
-        "breadcrumbs" => [
-            "Inicio" => url("/"),
-            "Materiales" => url("/catalogos/materiales")
-        ]
-    ]);
-}
-
-
-
-
-
 }

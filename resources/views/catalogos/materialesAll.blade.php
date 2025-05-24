@@ -39,6 +39,15 @@
                         <small class="text-muted">{{ $material->materia->nombre }}</small>
                         <div class="text-end">
                             <a href="{{ asset($material->url) }}" target="_blank" class="btn btn-ver">Ver</a>
+                            @if(auth()->user() && auth()->user()->rol == 'ADMIN')
+                                <button 
+                                    class="btn btn-danger btn-sm ms-2" 
+                                    onclick="confirmarEliminar({{ $material->id_recurso }}, '{{ addslashes($material->nombre) }}')"
+                                    title="Eliminar material"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -152,4 +161,60 @@
         background: linear-gradient(90deg, #003366, #0059b3);
     }
 </style>
+
+@if(auth()->user() && auth()->user()->rol == 'ADMIN')
+<!-- Modal de confirmación para eliminar material -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar el material "<span id="materialName" class="fw-bold"></span>"?</p>
+                <p class="text-danger mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btnConfirmDelete" class="btn btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario oculto para enviar la solicitud de eliminación -->
+<form id="deleteForm" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<!-- Script para confirmar eliminación -->
+<script>
+    // Variables globales para almacenar el ID y nombre del material
+    let currentMaterialId = null;
+    
+    function confirmarEliminar(id, nombre) {
+        // Guardamos el ID del material
+        currentMaterialId = id;
+        
+        // Actualizamos el nombre del material en el modal
+        document.getElementById('materialName').textContent = nombre;
+        
+        // Mostramos el modal
+        const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        modal.show();
+    }
+    
+    // Cuando se haga clic en el botón de confirmar eliminación
+    document.getElementById('btnConfirmDelete').addEventListener('click', function() {
+        // Configuramos el formulario
+        const form = document.getElementById('deleteForm');
+        form.action = '{{ url('/materiales') }}/' + currentMaterialId;
+        
+        // Enviamos el formulario
+        form.submit();
+    });
+</script>
+@endif
 @endsection

@@ -104,6 +104,9 @@ Route::middleware(['auth', 'can:ADMIN'])->group(function () {
     Route::get('/admin/notificaciones', [AdminController::class, 'notificaciones'])->name('admin.notificaciones');
     Route::post('/admin/notificaciones', [AdminController::class, 'enviarNotificacion'])->name('admin.notificaciones.post');
     
+    // Gestión de materiales
+    Route::delete('/materiales/{id}', [CatalogosController::class, 'eliminarMaterial'])->name('materiales.eliminar');
+    
     // Reportes del sistema
     Route::get('/admin/reportes', [AdminController::class, 'reportesIndex'])->name('admin.reportes');
     Route::get('/admin/reportes/usuarios', [AdminController::class, 'reporteUsuarios'])->name('admin.reportes.usuarios');
