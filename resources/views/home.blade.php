@@ -110,6 +110,31 @@
 
 @if(Auth::user()->esEstudiante())
 <div class="role-estudiante-only mb-4">
+    @php
+        $tipoAprendizaje = Auth::user()->tipo_aprendizaje;
+    @endphp
+
+    @if(empty($tipoAprendizaje))
+    <div class="alert alert-warning mb-4 shadow-sm border-left-warning">
+        <div class="d-flex align-items-center">
+            <div class="flex-shrink-0 me-3">
+                <i class="fas fa-exclamation-circle fa-2x text-warning"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h5 class="alert-heading">¡Completa tu perfil de estudiante!</h5>
+                <p class="mb-0">
+                    Para personalizar tu experiencia de aprendizaje, te recomendamos registrar tu estilo de aprendizaje preferido.
+                </p>
+                <div class="mt-2">
+                    <a href="{{ route('perfil.show') }}" class="btn btn-warning btn-sm">
+                        <i class="fas fa-brain me-1"></i> Definir mi estilo de aprendizaje
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="card border-success">
         <div class="card-header bg-success text-white">
             <h5 class="mb-0">Panel de Estudiante</h5>

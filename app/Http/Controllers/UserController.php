@@ -43,6 +43,7 @@ class UserController extends Controller
         if ($request->has('semestre')) $rules['semestre'] = 'required|integer|min:1|max:12';
         if ($request->has('id_genero')) $rules['id_genero'] = 'required|exists:genero,id_genero';
         if ($request->has('password')) $rules['password'] = 'nullable|min:8|confirmed';
+        if ($request->has('tipo_aprendizaje')) $rules['tipo_aprendizaje'] = 'nullable|string|max:50';
         
         try {
             // Log para depuración
@@ -81,6 +82,7 @@ class UserController extends Controller
             if ($request->has('fechaNacimiento')) $usuario->fechaNacimiento = $request->fechaNacimiento;
             if ($request->has('semestre')) $usuario->semestre = $request->semestre;
             if ($request->has('id_genero')) $usuario->id_genero = $request->id_genero;
+            if ($request->has('tipo_aprendizaje')) $usuario->tipo_aprendizaje = $request->tipo_aprendizaje;
             
             if ($request->filled('password')) {
                 $usuario->password = Hash::make($request->password);

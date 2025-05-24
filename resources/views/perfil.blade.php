@@ -8,6 +8,7 @@
 
 @section('scripts')
 <script src="{{ asset('js/toggle-estado.js') }}"></script>
+<script src="{{ asset('js/learning-style.js') }}"></script>
 @endsection
 
 @section('content')
@@ -318,7 +319,73 @@
         </div>
     </div>
 
-@if (auth()->user()->rol === 'ASESOR')
+    @if (auth()->user()->rol === 'ESTUDIANTE')
+    <div class="card mt-4 shadow">
+        <div class="card-header text-white py-2" style="background: linear-gradient(135deg, #28a745, #20c997);">
+            <div class="d-flex align-items-center">
+                <div class="me-2 d-flex align-items-center justify-content-center rounded-circle bg-white text-success" style="width: 32px; height: 32px;">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="card-title mb-0">
+                    Estilo de Aprendizaje
+                </h3>
+            </div>
+        </div>
+        <div class="card-body p-3">
+            <form action="{{ route('perfil.update', ['id_usuario' => $usuario->id_usuario]) }}" method="POST" id="aprendizajeForm">
+                @csrf
+                <div class="row">
+                    <div class="col-12 mb-2">
+                        <div class="info-item1 d-flex align-items-center border rounded p-3 bg-light h-100 shadow-sm">
+                            <div class="info-icon me-3 text-success">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="info-content position-relative w-100">
+                                <span class="info-label small text-muted d-block">Tipo de Aprendizaje</span>
+                                
+                                <!-- Vista normal -->
+                                <div class="d-flex align-items-center justify-content-between campo-vista" id="vista-aprendizaje">
+                                    <p class="info-text mb-0 fw-bold">{{ $usuario->tipo_aprendizaje ?? 'No registrado' }}</p>
+                                    <button type="button" class="btn btn-sm ms-3 p-0 text-success editar-campo" data-campo="aprendizaje">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Formulario de edición -->
+                                <div class="campo-edicion d-none" id="edicion-aprendizaje">
+                                    <div class="row gx-2">
+                                        <div class="col">
+                                            <select class="form-select form-select-sm mb-1" id="tipo_aprendizaje" name="tipo_aprendizaje">
+                                                <option value="" {{ $usuario->tipo_aprendizaje === null ? 'selected' : '' }}>Selecciona tu tipo de aprendizaje</option>
+                                                <option value="Visual" {{ $usuario->tipo_aprendizaje === 'Visual' ? 'selected' : '' }}>Visual</option>
+                                                <option value="Auditivo" {{ $usuario->tipo_aprendizaje === 'Auditivo' ? 'selected' : '' }}>Auditivo</option>
+                                                <option value="Kinestésico" {{ $usuario->tipo_aprendizaje === 'Kinestésico' ? 'selected' : '' }}>Kinestésico</option>
+                                                <option value="Lectura/Escritura" {{ $usuario->tipo_aprendizaje === 'Lectura/Escritura' ? 'selected' : '' }}>Lectura/Escritura</option>
+                                            </select>
+                                            <small class="form-text text-muted">Selecciona el estilo que mejor represente tu forma de aprender</small>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-success guardar-campo" data-campo="aprendizaje">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary cancelar-edicion" data-campo="aprendizaje">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
+
+    @if (auth()->user()->rol === 'ASESOR')
 <div class="card mt-5 shadow">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Horario de Disponibilidad</h5>
@@ -538,6 +605,8 @@ document.addEventListener('DOMContentLoaded', function() {
             } else if (campo === 'password') {
                 formData.append('password', document.getElementById('password').value);
                 formData.append('password_confirmation', document.getElementById('password_confirmation').value);
+            } else if (campo === 'aprendizaje') {
+                formData.append('tipo_aprendizaje', document.getElementById('tipo_aprendizaje').value);
             }
             
             // Mostrar indicador de carga
@@ -599,6 +668,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             document.querySelector('.toast-body').innerHTML = '<i class="fas fa-check-circle me-2 fs-5"></i><strong>¡Éxito!</strong>&nbsp;Correo electrónico actualizado correctamente.';
                         } else if (campo === 'password') {
                             document.querySelector('.toast-body').innerHTML = '<i class="fas fa-check-circle me-2 fs-5"></i><strong>¡Éxito!</strong>&nbsp;Contraseña actualizada correctamente.';
+                        } else if (campo === 'aprendizaje') {
+                            document.querySelector('#vista-aprendizaje .info-text').textContent = data.usuario.tipo_aprendizaje;
+                            document.querySelector('.toast-body').innerHTML = '<i class="fas fa-check-circle me-2 fs-5"></i><strong>¡Éxito!</strong>&nbsp;Tipo de aprendizaje actualizado correctamente.';
                         }
                     }
                     

@@ -100,6 +100,19 @@
                                                 <p class="info-text">{{ $asesoria->duracion }}</p>
                                             </div>
                                         </div>
+                                        <div class="info-item1">
+                                            <div class="info-icon">
+                                                <i class="fas fa-brain"></i>
+                                            </div>
+                                            <div class="info-content">
+                                                <span class="info-label">Estilo de Aprendizaje</span>
+                                                @if($asesoria->estudiante->tipo_aprendizaje)
+                                                    <span class="badge bg-info">{{ $asesoria->estudiante->tipo_aprendizaje }}</span>
+                                                @else
+                                                    <span class="badge bg-secondary">No registrado</span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>                                </div>
                                 <div class="card-footer">
                                     <div class="d-flex justify-content-center">

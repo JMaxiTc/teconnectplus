@@ -83,6 +83,18 @@
                                     </p>
                                     <p class="info-label">Asesor</p>
                                     <p class="info-text">{{ $asesoria->asesor->nombre }} {{ $asesoria->asesor->apellido }}</p>
+                                    
+                                    <p class="info-label">Mi Estilo de Aprendizaje</p>
+                                    <p class="info-text">
+                                        @if(Auth::user()->tipo_aprendizaje)
+                                            <span class="badge bg-info">{{ Auth::user()->tipo_aprendizaje }}</span>
+                                        @else
+                                            <span class="badge bg-secondary">No registrado</span>
+                                            <a href="{{ route('perfil.show') }}" class="text-primary ms-2 small">
+                                                <i class="fas fa-pencil-alt"></i> Registrar
+                                            </a>
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         </div>

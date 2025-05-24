@@ -90,6 +90,19 @@
                                                 </p>
                                             </div>
                                         </div>
+                                        <div class="info-item1">
+                                            <div class="info-icon">
+                                                <i class="fas fa-brain"></i>
+                                            </div>
+                                            <div class="info-content">
+                                                <span class="info-label">Mi Estilo de Aprendizaje</span>
+                                                @if(Auth::user()->tipo_aprendizaje)
+                                                    <span class="badge bg-info">{{ Auth::user()->tipo_aprendizaje }}</span>
+                                                @else
+                                                    <span class="badge bg-secondary">No registrado</span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="card-footer">

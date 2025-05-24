@@ -249,6 +249,24 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="info-item1">
+                                    <div class="info-icon">
+                                        <i class="fas fa-brain"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <span class="info-label">Estilo de Aprendizaje</span>
+                                        <p class="info-text">
+                                            @if($asesoria->estudiante->tipo_aprendizaje)
+                                                <span class="badge bg-info px-3 py-2">{{ $asesoria->estudiante->tipo_aprendizaje }}</span>
+                                            @else
+                                                <span class="badge bg-secondary px-3 py-2">No registrado</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

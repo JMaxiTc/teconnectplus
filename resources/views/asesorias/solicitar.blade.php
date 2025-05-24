@@ -49,7 +49,23 @@
                 </div>
                 <div class="card-body p-4">
                     <form action="{{ route('asesorias.solicitar.post') }}" method="POST" id="formAsesoria">
-                        @csrf                        <!-- Layout mejorado con distribución horizontal -->
+                        @csrf
+
+                        @if(empty(Auth::user()->tipo_aprendizaje))
+                        <div class="alert alert-info mb-4">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-brain fa-2x text-info"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-1">¡Personaliza tu experiencia de aprendizaje!</h5>
+                                    <p class="mb-0">Para que el asesor pueda adaptar mejor la sesión a tus necesidades, te recomendamos <a href="{{ route('perfil.show') }}" class="alert-link">registrar tu estilo de aprendizaje</a> en tu perfil.</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                        
+                        <!-- Layout mejorado con distribución horizontal -->
                         <div class="row">
                             <!-- Columna de selección de datos -->
                             <div class="col-lg-4">
@@ -500,7 +516,7 @@ function mostrarHorasDisponibles(asesorId, fecha) {
                 // Usamos directamente las horas iniciales como horas filtradas
                 horasFiltradas = horasIniciales;
             } else if (duracionSeleccionada === 60) {
-                // Para sesiones de 1 hora, necesitamos verificar que haya 2 bloques consecutivos de 30 minutos
+                // Para sesiones de 1 hora, necesitamos verificar que haya 2 bloques de 30 minutos
                 horasFiltradas = horasDisponibles.filter((hora, index) => {
                     if (index + 1 >= horasDisponibles.length) return false;
                     

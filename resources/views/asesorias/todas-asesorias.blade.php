@@ -83,6 +83,28 @@
                                                     <p class="info-text">{{ date('d/m/Y H:i', strtotime($asesoria->fecha)) }}</p>
                                                 </div>
                                             </div>
+                                            <div class="info-item1">
+                                                <div class="info-icon">
+                                                    <i class="fas fa-user-graduate"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <span class="info-label">Estudiante</span>
+                                                    <p class="info-text">{{ $asesoria->estudiante->nombre }} {{ $asesoria->estudiante->apellido }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="info-item1">
+                                                <div class="info-icon">
+                                                    <i class="fas fa-brain"></i>
+                                                </div>
+                                                <div class="info-content">
+                                                    <span class="info-label">Estilo de Aprendizaje</span>
+                                                    @if($asesoria->estudiante->tipo_aprendizaje)
+                                                        <span class="badge bg-info">{{ $asesoria->estudiante->tipo_aprendizaje }}</span>
+                                                    @else
+                                                        <span class="badge bg-secondary">No registrado</span>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
                                         @if($asesoria->estado === 'CANCELADA' && $asesoria->observaciones)
                                         <div class="alert alert-danger mt-3 mb-0">

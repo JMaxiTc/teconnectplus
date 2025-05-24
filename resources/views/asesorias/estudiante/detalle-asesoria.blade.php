@@ -298,6 +298,39 @@
         </div>    </div>
 </div>
 
+<!-- Información de estilo de aprendizaje (Solo visible para el estudiante) -->
+<div class="card shadow-sm border-0 rounded-lg mb-4">
+    <div class="card-header bg-white py-3 border-bottom">
+        <h3 class="text-xl font-semibold text-gray-800 mb-0">
+            <i class="fas fa-brain text-primary me-2"></i>
+            Mi Estilo de Aprendizaje
+        </h3>
+    </div>
+    <div class="card-body p-4">
+        <div class="info-section">
+            <div class="info-item1">
+                <div class="info-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="info-content">
+                    <span class="info-label">Mi estilo de aprendizaje</span>
+                    <div class="d-flex align-items-center mt-1">
+                        @if(Auth::user()->tipo_aprendizaje)
+                            <span class="badge bg-info px-3 py-2 fs-6">{{ Auth::user()->tipo_aprendizaje }}</span>
+                            <span class="ms-2 text-muted">(Esta información es visible para tu asesor)</span>
+                        @else
+                            <span class="badge bg-secondary px-3 py-2 fs-6">No registrado</span>
+                            <a href="{{ route('perfil.show') }}" class="btn btn-outline-info btn-sm ms-2">
+                                <i class="fas fa-pencil-alt me-1"></i> Registrar estilo
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal para calificar al asesor -->
 @if($asesoria->estado === 'FINALIZADA' && empty($asesoria->fk_id_calificacion))
 <div class="modal fade" id="calificarModal" tabindex="-1" aria-labelledby="calificarModalLabel" aria-hidden="true">
