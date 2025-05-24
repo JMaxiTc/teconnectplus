@@ -9,6 +9,24 @@
                     <h4 class="mb-0">Iniciar sesión</h4>
                 </div>
                 <div class="card-body">
+                    @if(session('cuenta_desactivada'))
+                        <div class="alert alert-danger mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3">
+                                    <i class="fas fa-user-lock fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="alert-heading">¡Cuenta desactivada!</h5>
+                                    <p class="mb-0">{{ session('error') ?? 'Tu cuenta ha sido desactivada por un administrador. Si crees que esto es un error, por favor contacta al soporte técnico.' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif(session('error'))
+                        <div class="alert alert-danger mb-3">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
 

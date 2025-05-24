@@ -13,7 +13,7 @@ class Usuario extends Authenticatable
     protected $primaryKey='id_usuario';
     public $incrementing=false; // Cambiar a false para indicar que el ID no es autoincremental
     protected $keyType='int';
-    protected $fillable=["id_usuario", "nombre","apellido", "carrera","correo", "fechaNacimiento", "id_genero", "rol", "semestre", "password", "fecha_creacion", "tipo_aprendizaje"]; // Se agregó tipo_aprendizaje
+    protected $fillable=["id_usuario", "nombre","apellido", "carrera","correo", "fechaNacimiento", "id_genero", "rol", "semestre", "password", "fecha_creacion", "tipo_aprendizaje", "estado"]; // Se agregó estado
     public $timestamps=false;
     
     /**
@@ -109,5 +109,14 @@ public function disponibilidades()
     return $this->hasMany(DisponibilidadAsesor::class, 'id_asesor', 'id_usuario');
 }
 
+/**
+ * Check if user is active
+ *
+ * @return bool
+ */
+public function estaActivo()
+{
+    return strtolower($this->estado) === 'activo';
+}
 
 }

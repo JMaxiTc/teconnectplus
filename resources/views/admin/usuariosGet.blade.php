@@ -29,6 +29,7 @@
                         <th>Rol</th>
                         <th>Semestre</th>
                         <th>Email</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -44,7 +45,18 @@
                         <td>{{ $usuario->semestre }}</td>
                         <td>{{ $usuario->correo }}</td>
                         <td>
+                            <span class="badge bg-{{ strtolower($usuario->estado) === 'activo' ? 'success' : 'danger' }}">
+                                {{ $usuario->estado }}
+                            </span>
+                        </td>
+                        <td>
                             <a href="{{ url('/admin/usuarios/' . $usuario->id_usuario . '/actualizar') }}" class="btn btn-sm btn-warning">Editar</a>
+                            <form action="{{ url('/admin/usuarios/' . $usuario->id_usuario . '/toggle-estado') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-sm {{ strtolower($usuario->estado) === 'activo' ? 'btn-danger' : 'btn-success' }}">
+                                    {{ strtolower($usuario->estado) === 'activo' ? 'Desactivar' : 'Activar' }}
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     @endforeach

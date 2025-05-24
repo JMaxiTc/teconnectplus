@@ -40,6 +40,18 @@ class AuthController extends Controller
             'correo' => $credentials['correo'],
             'password' => $credentials['password'],
         ])) {
+            // Verificar si el usuario está activo
+            $user = Auth::user();
+            if (strtolower($user->estado) === 'inactivo') {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+                
+                return redirect()->route('login')
+                    ->with('cuenta_desactivada', true)
+                    ->with('error', 'Tu cuenta ha sido desactivada por un administrador. Si crees que esto es un error, por favor contacta al soporte técnico.');
+            }
+            
             $request->session()->regenerate();
             
             // Redireccionar a la URL especificada o a la página principal
@@ -113,6 +125,7 @@ class AuthController extends Controller
             'rol' => $request->rol,
             'semestre' => $request->semestre,
             'fecha_creacion' => now(), // Agregamos la fecha actual para el registro
+            'estado' => 'activo', // Estado por defecto al registrarse
         ]);
 
         Auth::login($usuario);

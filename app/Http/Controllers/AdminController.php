@@ -97,11 +97,13 @@ class AdminController extends Controller
         $request->validate([
             'correo' => 'required|email|unique:usuario,correo,' . $user->id_usuario . ',id_usuario',
             'password' => 'nullable|string|min:8|confirmed',
+            'estado' => 'required|in:activo,inactivo',
         ]);
 
         // Solo obtener los campos que se deben actualizar
         $datos = $request->only([
-            'correo'
+            'correo',
+            'estado'
         ]);
 
         // Si se proporciona una nueva contraseña, agregarla al array de datos
@@ -115,6 +117,64 @@ class AdminController extends Controller
         // Redirigir con mensaje de éxito
         session()->flash('tipo', 'success');  // Tipo de mensaje: 'success', 'error', etc.
         session()->flash('mensaje', '¡Usuario actualizado correctamente!');
+        return redirect('/admin/usuarios');
+    }
+
+    /**
+     * Cambiar el estado del usuario (activo/inactivo)
+     */
+    public function toggleEstadoUsuario($id_usuario)
+    {
+        // Obtener al usuario por ID
+        $user = Usuario::findOrFail($id_usuario);
+
+        // Cambiar el estado (si es activo -> inactivo, si es inactivo -> activo)
+        $nuevoEstado = strtolower($user->estado) === 'activo' ? 'inactivo' : 'activo';
+        
+        // Si estamos desactivando al usuario, forzamos el cierre de todas sus sesiones activas
+        if ($nuevoEstado === 'inactivo') {
+            // 1. Eliminamos todas las sesiones de la base de datos
+            DB::table('sessions')
+                ->where('user_id', $id_usuario)
+                ->delete();
+                
+            // 2. Establecemos el estado a inactivo y guardamos la fecha de desactivación
+            $user->update([
+                'estado' => $nuevoEstado,
+                // Podríamos guardar información adicional aquí si fuera necesario
+                // 'fecha_desactivacion' => now(),
+            ]);
+            
+            // 3. Creamos una notificación para el usuario (opcional)
+            // Esto permitiría ver un mensaje en el sistema de notificaciones
+            try {
+                if (class_exists('App\\Models\\Notificacion')) {
+                    \App\Models\Notificacion::create([
+                        'id_usuario' => $id_usuario,
+                        'titulo' => 'Cuenta desactivada',
+                        'mensaje' => 'Tu cuenta ha sido desactivada por un administrador. Por favor contacta con soporte para más información.',
+                        'tipo' => 'warning',
+                        'icono' => 'fa-exclamation-circle',
+                        'leida' => false,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            } catch (\Exception $e) {
+                // Ignoramos errores de notificaciones, no son críticos
+            }
+        } else {
+            // Si lo estamos activando, simplemente actualizamos su estado
+            $user->update(['estado' => $nuevoEstado]);
+        }
+
+        // Mensaje informativo
+        $accion = $nuevoEstado === 'activo' ? 'activado' : 'desactivado';
+        
+        // Redirigir con mensaje de éxito
+        session()->flash('tipo', 'success');
+        session()->flash('mensaje', "¡Usuario {$accion} correctamente! " . 
+            ($nuevoEstado === 'inactivo' ? 'Sus sesiones activas serán cerradas en la próxima solicitud.' : ''));
         return redirect('/admin/usuarios');
     }
 

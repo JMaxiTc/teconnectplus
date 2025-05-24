@@ -13,6 +13,8 @@
     <link href="{{ URL::asset('assets/style.css') }}" rel="stylesheet" />
     <link href="{{ URL::asset('assets/calificaciones.css') }}" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     
     @yield('styles')
     
@@ -93,7 +95,7 @@
     @guest
         user-guest
     @else
-        user-auth role-{{ strtolower(Auth::user()->rol) }}
+        user-auth role-{{ strtolower(Auth::user()->rol) }} authenticated
     @endguest
 ">
     <div class="container mt-5 pt-4">
@@ -113,9 +115,12 @@
     <!-- Actualización: Cargar Bootstrap Bundle que incluye Popper -->
     <script src="{{ URL::asset('bootstrap-5.3.5-dist/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ URL::asset('DataTables/datatables.min.js') }}"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ URL::asset('js/interceptor.js') }}"></script>
     <script src="{{ URL::asset('js/notificaciones.js') }}"></script>
     <script src="{{ URL::asset('js/app.js') }}"></script>
+    <script src="{{ URL::asset('js/verificar-estado.js') }}"></script>
     
     <!-- Scripts para control de roles -->
     <script>

@@ -51,6 +51,18 @@
             <div class="info-value">{{ $user->rol }}</div>
         </div>
 
+        <!-- Estado (editable) -->
+        <div class="info-item">
+            <div class="info-label">Estado</div>
+            <select name="estado" class="form-select @error('estado') is-invalid @enderror">
+                <option value="activo" {{ strtolower($user->estado) === 'activo' ? 'selected' : '' }}>Activo</option>
+                <option value="inactivo" {{ strtolower($user->estado) === 'inactivo' ? 'selected' : '' }}>Inactivo</option>
+            </select>
+            @error('estado')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
         <!-- Correo (editable) -->
         <div class="info-item">
             <div class="info-label">Correo</div>

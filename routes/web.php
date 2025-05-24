@@ -27,7 +27,28 @@ Route::middleware('guest')->group(function () {
 });
 
 // Rutas protegidas (requieren autenticación)
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'web'])->group(function () {
+    // Verificar estado del usuario
+    Route::get('/verificar-estado', function() {
+        if (!auth()->check()) {
+            return response()->json(['activo' => false, 'mensaje' => 'No hay sesión activa.']);
+        }
+        
+        // Obtener usuario fresco de la base de datos
+        $usuario = \App\Models\Usuario::find(auth()->id());
+        
+        if (!$usuario || strtolower($usuario->estado) === 'inactivo') {
+            auth()->logout();
+            session()->invalidate();
+            session()->regenerateToken();
+            return response()->json([
+                'activo' => false, 
+                'mensaje' => 'Tu cuenta ha sido desactivada por un administrador. Si crees que esto es un error, por favor contacta al soporte técnico.'
+            ]);
+        }
+        
+        return response()->json(['activo' => true]);
+    })->name('verificar.estado');
     // Ruta para cerrar sesión
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
@@ -79,6 +100,7 @@ Route::middleware(['auth', 'can:ADMIN'])->group(function () {
     Route::post('/admin/usuarios/agregar', [AdminController::class, 'usuariosAgregarPost']);
     Route::get('/admin/usuarios/{id_usuario}/actualizar', [AdminController::class, 'usuariosActualizarGet']);
     Route::post('/admin/usuarios/{id_usuario}/actualizar', [AdminController::class, 'usuariosActualizarPost']);
+    Route::post('/admin/usuarios/{id_usuario}/toggle-estado', [AdminController::class, 'toggleEstadoUsuario']);
     Route::get('/admin/notificaciones', [AdminController::class, 'notificaciones'])->name('admin.notificaciones');
     Route::post('/admin/notificaciones', [AdminController::class, 'enviarNotificacion'])->name('admin.notificaciones.post');
     
